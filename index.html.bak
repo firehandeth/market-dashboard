@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐭 大鼠市场风控仪表盘 | Market Risk Dashboard v2</title>
+<title>🐭 大鼠市场风控仪表盘 | Market Risk Dashboard</title>
 <style>
 /* ── Reset & Base ───────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -143,64 +143,6 @@ body::after{
 .tag.above{background:rgba(0,204,102,.15);color:var(--green)}
 .tag.below{background:rgba(238,51,68,.15);color:var(--red)}
 .tag.neutral{background:rgba(136,136,170,.15);color:var(--text-dim)}
-
-/* ── v2: SMA distance inline ──────────────────────────────── */
-.sma-dist{font-size:.6rem;font-family:var(--font-mono);margin-left:2px}
-.sma-dist.pos{color:var(--green)}
-.sma-dist.neg{color:var(--red)}
-
-/* ── v2: Correlation / Velocity / ATR tags ────────────────── */
-.tag.high{background:rgba(255,51,85,.15);color:var(--red)}
-.tag.medium{background:rgba(238,187,0,.15);color:var(--yellow)}
-.tag.low{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.calm{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.volatile{background:rgba(255,51,85,.15);color:var(--red)}
-.tag.normal-tag{background:rgba(238,187,0,.15);color:var(--yellow)}
-
-/* ── v2: Dispersion bar ───────────────────────────────────── */
-.dispersion-bar{
-  display:flex;align-items:center;gap:8px;margin-bottom:8px;
-  padding:6px 10px;background:var(--bg3);border-radius:6px;
-  font-size:.72rem;font-family:var(--font-mono);
-}
-.dispersion-bar .disp-label{color:var(--text-dim)}
-.dispersion-bar .disp-value{font-weight:700}
-
-/* ── v2: Failed breakout tag ──────────────────────────────── */
-.tag.fb{background:rgba(255,51,85,.2);color:var(--neon-red);font-weight:700}
-
-/* ── v2: 52W distance in leader chips ─────────────────────── */
-.leader-chip .l52w{font-size:.6rem;color:var(--text-muted);margin-top:2px}
-
-/* ── v2: Spike revert / divergence ────────────────────────── */
-.tag.reverted{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.not-reverted{background:rgba(255,136,0,.15);color:var(--neon-orange)}
-.tag.bullish-div{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.bearish-div{background:rgba(255,51,85,.15);color:var(--red)}
-
-/* ── v2: Rotation section ─────────────────────────────────── */
-.rotation-section{
-  background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:10px;
-  font-size:.75rem;
-}
-.rotation-section .rot-title{
-  font-size:.72rem;color:var(--text-dim);margin-bottom:6px;
-}
-.rotation-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:3px 0;font-family:var(--font-mono);
-}
-.rotation-row .rot-label{color:var(--text-dim)}
-.rotation-row .rot-val{font-weight:600}
-.tag.risk-off{background:rgba(255,51,85,.15);color:var(--red)}
-.tag.risk-on{background:rgba(0,204,102,.15);color:var(--green)}
-
-/* ── v2: Sector dist inline ───────────────────────────────── */
-.sector-dist{font-size:.55rem;color:var(--text-muted);font-family:var(--font-mono)}
-
-/* ── v2: Credit spread ────────────────────────────────────── */
-.tag.healthy{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.tightening{background:rgba(255,51,85,.15);color:var(--red)}
 
 /* ── Leader Grid ────────────────────────────────────────────── */
 .leader-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px}
@@ -417,7 +359,7 @@ input[type=range]::-webkit-slider-thumb{
   </div>
 
   <div class="footer">
-    🐭 大鼠风控仪表盘 v2.0 · Data refreshes every 5min ·
+    🐭 大鼠风控仪表盘 v1.0 · Data refreshes every 5min ·
     <button id="btn-refresh" onclick="manualRefresh()" style="
       background:var(--bg3);border:1px solid var(--neon-cyan);color:var(--neon-cyan);
       padding:4px 16px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);
@@ -432,7 +374,7 @@ input[type=range]::-webkit-slider-thumb{
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   DASHBOARD JS v2 — Pure Vanilla
+   DASHBOARD JS — Pure Vanilla
    ═══════════════════════════════════════════════════════════════ */
 
 const DATA_PATH = './market-dashboard.json';
@@ -484,24 +426,6 @@ function trendTag(status){
 }
 function chgClass(v){return v==null?'':v>=0?'up':'down'}
 
-// ── v2: SMA distance helper ─────────────────────────────────
-function smaDistSpan(distVal) {
-  if(distVal == null) return '';
-  const sign = distVal >= 0 ? '+' : '';
-  const cls = distVal >= 0 ? 'pos' : 'neg';
-  const arrow = distVal >= 0 ? '▲' : '▼';
-  return `<span class="sma-dist ${cls}">${arrow} ${sign}${distVal.toFixed(1)}%</span>`;
-}
-
-// ── v2: Trend tag with inline dist ──────────────────────────
-function trendTagWithDist(status, distVal) {
-  let tag = trendTag(status);
-  if(distVal != null) {
-    tag += smaDistSpan(distVal);
-  }
-  return tag;
-}
-
 // ── Gauge ────────────────────────────────────────────────────
 function setGauge(pct){
   const circ = document.getElementById('gauge-circle');
@@ -545,49 +469,20 @@ function renderDim1(dim){
   const rows = [];
   for(const key of ['SPY','QQQ']){
     const d=a[key];if(!d) continue;
-    rows.push(`<div class="metric-row"><span class="label">${key}</span><span class="value">${fmtPrice(d.price)} ${trendTagWithDist(d.trend_50, d.dist_50)}<small style="color:var(--text-muted)">50SMA</small> ${trendTagWithDist(d.trend_200, d.dist_200)}<small style="color:var(--text-muted)">200SMA</small></span></div>`);
+    rows.push(`<div class="metric-row"><span class="label">${key}</span><span class="value">${fmtPrice(d.price)} ${trendTag(d.trend_50)}<small style="color:var(--text-muted)">50SMA</small> ${trendTag(d.trend_200)}<small style="color:var(--text-muted)">200SMA</small></span></div>`);
     rows.push(`<div class="metric-row"><span class="label" style="padding-left:12px">变化 Change</span><span class="value"><span class="chg ${chgClass(d.chg_1w)}">${fmtPct(d.chg_1w)} 1W</span> · <span class="chg ${chgClass(d.chg_1m)}">${fmtPct(d.chg_1m)} 1M</span> · <span class="chg ${chgClass(d.chg_3m)}">${fmtPct(d.chg_3m)} 3M</span></span></div>`);
   }
   // Relative strength
   rows.push(`<div class="metric-row"><span class="label">相对强弱 RS</span><span class="value">${dim.relative_strength||'—'} 领先 (${fmtPct(dim.relative_spread)})</span></div>`);
   // BTC
   const btc=a.BTC;
-  if(btc){
-    rows.push(`<div class="metric-row"><span class="label">BTC 风险偏好</span><span class="value">${fmtPrice(btc.price)} <span class="chg ${chgClass(btc.chg_1m)}">${fmtPct(btc.chg_1m)} 1M</span></span></div>`);
-  }
-  // v2: BTC-SPY Correlation
-  if(dim.btc_spy_correlation != null){
-    const corr = dim.btc_spy_correlation;
-    let corrTagClass, corrTagText;
-    if(corr > 0.5){ corrTagClass='high'; corrTagText='高 High'; }
-    else if(corr >= 0.3){ corrTagClass='medium'; corrTagText='中 Medium'; }
-    else { corrTagClass='low'; corrTagText='低 Low'; }
-    rows.push(`<div class="metric-row"><span class="label">BTC-SPY 相关性</span><span class="value">${corr.toFixed(2)} <span class="tag ${corrTagClass}">${corrTagText}</span></span></div>`);
-  }
-  // Oil + v2: WTI ATR%
+  if(btc) rows.push(`<div class="metric-row"><span class="label">BTC 风险偏好</span><span class="value">${fmtPrice(btc.price)} <span class="chg ${chgClass(btc.chg_1m)}">${fmtPct(btc.chg_1m)} 1M</span></span></div>`);
+  // Oil
   const wti=a.WTI;
-  if(wti){
-    let wtiExtra = '';
-    if(dim.wti_atr_pct != null){
-      const atr = dim.wti_atr_pct;
-      let atrTagClass, atrTagText;
-      if(atr < 2){ atrTagClass='calm'; atrTagText='低 Calm'; }
-      else if(atr <= 3.5){ atrTagClass='normal-tag'; atrTagText='中 Normal'; }
-      else { atrTagClass='volatile'; atrTagText='高 Volatile'; }
-      wtiExtra = ` <small style="color:var(--text-muted)">原油波动率 Oil ATR%:</small> ${atr.toFixed(1)}% <span class="tag ${atrTagClass}">${atrTagText}</span>`;
-    }
-    rows.push(`<div class="metric-row"><span class="label">WTI 原油</span><span class="value">${fmtPrice(wti.price)} <span class="chg ${chgClass(wti.chg_1w)}">${fmtPct(wti.chg_1w)} 1W</span>${wtiExtra}</span></div>`);
-  }
-  // TNX + v2: Rate Velocity
+  if(wti) rows.push(`<div class="metric-row"><span class="label">WTI 原油</span><span class="value">${fmtPrice(wti.price)} <span class="chg ${chgClass(wti.chg_1w)}">${fmtPct(wti.chg_1w)} 1W</span></span></div>`);
+  // TNX
   const tnx=a.TNX;
-  if(tnx){
-    let tnxExtra = '';
-    if(dim.rate_velocity_1w != null){
-      const rv = dim.rate_velocity_1w;
-      tnxExtra = ` <small style="color:var(--text-muted)">利率变速 Rate Velocity:</small> <span class="chg ${chgClass(rv)}">${rv >= 0 ? '+' : ''}${rv.toFixed(2)} bps</span>`;
-    }
-    rows.push(`<div class="metric-row"><span class="label">10Y 收益率</span><span class="value">${tnx.price!=null?tnx.price.toFixed(2)+'%':'—'} <span class="chg ${chgClass(tnx.chg_1w)}">${fmtPct(tnx.chg_1w)} 1W</span>${tnxExtra}</span></div>`);
-  }
+  if(tnx) rows.push(`<div class="metric-row"><span class="label">10Y 收益率</span><span class="value">${tnx.price!=null?tnx.price.toFixed(2)+'%':'—'} <span class="chg ${chgClass(tnx.chg_1w)}">${fmtPct(tnx.chg_1w)} 1W</span></span></div>`);
   // DXY
   const dxy=a.DXY;
   if(dxy) rows.push(`<div class="metric-row"><span class="label">DXY 美元指数</span><span class="value">${dxy.price!=null?dxy.price.toFixed(2):'—'} <span class="chg ${chgClass(dxy.chg_1w)}">${fmtPct(dxy.chg_1w)} 1W</span></span></div>`);
@@ -603,43 +498,16 @@ function renderDim1(dim){
 // ── Dimension 2: Leaders ─────────────────────────────────────
 function renderDim2(dim){
   const leaders = dim.leaders||{};
-  // v2: Dispersion above leader grid
-  let html = '';
-  if(dim.dispersion != null){
-    const disp = dim.dispersion;
-    let dispColor;
-    if(disp < 5) dispColor = 'var(--green)';
-    else if(disp <= 10) dispColor = 'var(--yellow)';
-    else dispColor = 'var(--red)';
-    html += `<div class="dispersion-bar"><span class="disp-label">龙头离散度 Dispersion:</span> <span class="disp-value" style="color:${dispColor}">${disp.toFixed(1)}%</span></div>`;
-  }
-  // Above 50SMA count + v2: failed_breakout_count
-  let fbCountExtra = '';
-  if(dim.failed_breakout_count != null && dim.failed_breakout_count > 0){
-    fbCountExtra = ` · <span style="color:var(--red)">⚠ 假突破 Failed Breakouts: ${dim.failed_breakout_count}</span>`;
-  }
-  html+=`<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:6px">Above 50SMA: ${dim.above_50sma_count}/${dim.total}${fbCountExtra}</div>`;
+  let html=`<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:6px">Above 50SMA: ${dim.above_50sma_count}/${dim.total}</div>`;
   html+='<div class="leader-grid">';
   for(const [sym,m] of Object.entries(leaders)){
     const bullish = m.trend_50==='above' && (m.chg_1m==null||m.chg_1m>0);
-    // v2: 52W dist line
-    let dist52w = '';
-    if(m.high_52w_dist != null){
-      dist52w = `<div class="l52w">52W: ${m.high_52w_dist >= 0 ? '+' : ''}${m.high_52w_dist.toFixed(1)}%</div>`;
-    }
-    // v2: failed breakout tag
-    let fbTag = '';
-    if(m.failed_breakout){
-      fbTag = '<span class="tag fb">⚠ FB</span>';
-    }
     html+=`<div class="leader-chip ${bullish?'bullish':'bearish'}">
       <div class="lsym">${sym}</div>
       <div class="lpx">${fmtPrice(m.price)}</div>
-      ${dist52w}
       <div class="ltags">
         ${trendTag(m.trend_50)}
         <span class="tag ${m.rsi14!=null&&m.rsi14>60?'above':m.rsi14!=null&&m.rsi14<40?'below':'neutral'}">RSI ${m.rsi14!=null?m.rsi14:'—'}</span>
-        ${fbTag}
       </div>
       <div style="margin-top:3px"><span class="chg ${chgClass(m.chg_1w)}">${fmtPct(m.chg_1w)} 1W</span> <span class="chg ${chgClass(m.chg_1m)}">${fmtPct(m.chg_1m)} 1M</span></div>
     </div>`;
@@ -663,35 +531,6 @@ function renderDim3(dim){
   html+=`<div class="metric-row"><span class="label">VIX3M</span><span class="value">${v3m.price!=null?v3m.price.toFixed(1):'—'}</span></div>`;
   html+=`<div class="metric-row"><span class="label">期限结构 Term</span><span class="value">${dim.term_ratio!=null?dim.term_ratio.toFixed(3):''} <span class="tag ${dim.term_structure==='contango'?'above':'below'}">${dim.term_structure||'—'}</span></span></div>`;
   html+=`<div class="metric-row"><span class="label">波动聚集 Vol Cluster</span><span class="value">${dim.vol_cluster_count!=null?dim.vol_cluster_count+' days (>2% SPY)':'—'}</span></div>`;
-
-  // v2: Spike Revert
-  if(dim.spike_revert != null){
-    const sr = dim.spike_revert;
-    let srValueStr = '';
-    if(sr.peak != null && sr.current != null && sr.revert_pct != null){
-      srValueStr = `Peak ${sr.peak.toFixed(1)} → ${sr.current.toFixed(1)} (${sr.revert_pct >= 0 ? '+' : ''}${sr.revert_pct.toFixed(1)}%)`;
-    }
-    const reverted = sr.reverted === true;
-    const srTag = reverted
-      ? '<span class="tag reverted">✅ 已回落</span>'
-      : '<span class="tag not-reverted">⚠ 未回落</span>';
-    html+=`<div class="metric-row"><span class="label">VIX Spike 回落</span><span class="value">${srValueStr} ${srTag}</span></div>`;
-  }
-
-  // v2: SPY Divergence
-  if(dim.spy_divergence != null){
-    const div = dim.spy_divergence;
-    let divTag;
-    if(div === 'bearish_divergence'){
-      divTag = '<span class="tag bearish-div">⚠ 看跌背离</span>';
-    } else if(div === 'bullish_divergence'){
-      divTag = '<span class="tag bullish-div">✅ 看涨背离</span>';
-    } else {
-      divTag = '<span class="tag neutral">无 None</span>';
-    }
-    html+=`<div class="metric-row"><span class="label">VIX-SPY 背离</span><span class="value">${divTag}</span></div>`;
-  }
-
   return html;
 }
 
@@ -701,25 +540,6 @@ function renderDim4(dim){
   let html=`<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:6px">Above 50SMA: ${dim.above_50sma||0}/${dim.total||0} · Positive 1M: ${dim.positive_1m||0}/${dim.total||0}</div>`;
   if(dim.best) html+=`<div style="font-size:.72rem;margin-bottom:8px">🏆 最强: <span style="color:var(--green)">${dim.best}</span> · 🔻 最弱: <span style="color:var(--red)">${dim.worst}</span></div>`;
 
-  // v2: Sector Rotation section
-  if(dim.rotation != null){
-    const rot = dim.rotation;
-    let signalTag, signalClass;
-    if(rot.signal === 'risk_off'){
-      signalTag = '⚠ Risk Off'; signalClass = 'risk-off';
-    } else if(rot.signal === 'risk_on'){
-      signalTag = '✅ Risk On'; signalClass = 'risk-on';
-    } else {
-      signalTag = '— Neutral'; signalClass = 'neutral';
-    }
-    html+=`<div class="rotation-section">
-      <div class="rot-title">板块轮动 Sector Rotation</div>
-      <div class="rotation-row"><span class="rot-label">防御板块均值 Defensive Avg</span><span class="rot-val">${rot.defensive_avg != null ? rot.defensive_avg.toFixed(2) + '%' : '—'}</span></div>
-      <div class="rotation-row"><span class="rot-label">进攻板块均值 Offensive Avg</span><span class="rot-val">${rot.offensive_avg != null ? rot.offensive_avg.toFixed(2) + '%' : '—'}</span></div>
-      <div class="rotation-row"><span class="rot-label">信号 Signal</span><span class="rot-val"><span class="tag ${signalClass}">${signalTag}</span></span></div>
-    </div>`;
-  }
-
   // Find max abs change for scaling
   let maxAbs=1;
   for(const m of Object.values(sectors)){if(m.chg_1m!=null) maxAbs=Math.max(maxAbs,Math.abs(m.chg_1m))}
@@ -728,19 +548,11 @@ function renderDim4(dim){
     const chg=m.chg_1m||0;
     const w = Math.abs(chg)/maxAbs*100;
     const pos = chg>=0;
-    // v2: dist_50 and dist_200 for sectors
-    let distInfo = '';
-    if(m.dist_50 != null || m.dist_200 != null){
-      const d50 = m.dist_50 != null ? `50: ${m.dist_50 >= 0 ? '+' : ''}${m.dist_50.toFixed(1)}%` : '';
-      const d200 = m.dist_200 != null ? `200: ${m.dist_200 >= 0 ? '+' : ''}${m.dist_200.toFixed(1)}%` : '';
-      distInfo = `<span class="sector-dist">${d50}${d50 && d200 ? ' ' : ''}${d200}</span>`;
-    }
     html+=`<div class="sector-row">
       <span class="sname">${sym}</span>
       <span class="stag">${m.trend_50==='above'?'✅':'❌'}</span>
       <div class="sector-bar-wrap"><div class="sector-bar ${pos?'pos':'neg'}" style="width:${Math.max(w,2)}%"></div></div>
       <span class="sval chg ${chgClass(chg)}">${fmtPct(chg)}</span>
-      ${distInfo}
     </div>`;
   }
   return html;
@@ -751,28 +563,6 @@ function renderDim5(dim){
   const notes=dim.notes||[];
   let html='';
   for(const n of notes) html+=`<div class="macro-note">• ${n}</div>`;
-
-  // v2: Credit Spread Proxy
-  if(dim.credit_spread_proxy != null){
-    const cs = dim.credit_spread_proxy;
-    let csTag, csClass;
-    if(cs.value != null && cs.value >= 0){
-      csTag = '健康 Healthy'; csClass = 'healthy';
-    } else {
-      csTag = '收紧 Tightening'; csClass = 'tightening';
-    }
-    html += `<div style="margin-top:8px;padding:8px 10px;background:var(--bg3);border-radius:6px;font-size:.78rem;">`;
-    html += `<div class="metric-row"><span class="label">信用利差 Credit Spread (HYG-LQD)</span><span class="value">${cs.value != null ? cs.value.toFixed(2) + '%' : '—'} <span class="tag ${csClass}">${csTag}</span></span></div>`;
-    // HYG details
-    if(cs.hyg != null){
-      html += `<div class="metric-row"><span class="label" style="padding-left:12px">HYG</span><span class="value">${fmtPrice(cs.hyg.price)} <span class="chg ${chgClass(cs.hyg.chg_1m)}">${fmtPct(cs.hyg.chg_1m)} 1M</span></span></div>`;
-    }
-    // LQD details
-    if(cs.lqd != null){
-      html += `<div class="metric-row"><span class="label" style="padding-left:12px">LQD</span><span class="value">${fmtPrice(cs.lqd.price)} <span class="chg ${chgClass(cs.lqd.chg_1m)}">${fmtPct(cs.lqd.chg_1m)} 1M</span></span></div>`;
-    }
-    html += `</div>`;
-  }
 
   // Events
   const events=dim.events||[];
@@ -948,75 +738,58 @@ const SAMPLE_DATA = {
   "dim1_environment":{
     "score":0.067,
     "assets":{
-      "SPY":{"price":634.09,"sma50":580,"sma200":560,"trend_50":"above","trend_200":"above","dist_50":9.3,"dist_200":13.2,"chg_1w":-2.5,"chg_1m":-8.1,"chg_3m":-5.2},
-      "QQQ":{"price":562.58,"sma50":520,"sma200":500,"trend_50":"above","trend_200":"above","dist_50":8.2,"dist_200":12.5,"chg_1w":-3.1,"chg_1m":-10.2,"chg_3m":-7.8},
-      "BTC":{"price":66750,"sma50":70000,"sma200":65000,"trend_50":"below","trend_200":"above","dist_50":-4.6,"dist_200":2.7,"chg_1w":-4.2,"chg_1m":-12.5,"chg_3m":-8.0},
-      "WTI":{"price":99.64,"sma50":85,"sma200":80,"trend_50":"above","trend_200":"above","dist_50":17.2,"dist_200":24.6,"chg_1w":5.2,"chg_1m":12.3,"chg_3m":18.5},
-      "TNX":{"price":4.44,"sma50":4.3,"sma200":4.2,"trend_50":"above","trend_200":"above","dist_50":3.3,"dist_200":5.7,"chg_1w":2.1,"chg_1m":5.0,"chg_3m":3.2},
-      "DXY":{"price":104.2,"sma50":103,"sma200":102,"trend_50":"above","trend_200":"above","dist_50":1.2,"dist_200":2.2,"chg_1w":0.8,"chg_1m":1.5,"chg_3m":2.0},
-      "GLD":{"price":285,"sma50":270,"sma200":260,"trend_50":"above","trend_200":"above","dist_50":5.6,"dist_200":9.6,"chg_1w":1.5,"chg_1m":4.2,"chg_3m":8.0},
-      "CPER":{"price":28,"sma50":27,"sma200":26,"trend_50":"above","trend_200":"above","dist_50":3.7,"dist_200":7.7,"chg_1w":-0.5,"chg_1m":-2.0,"chg_3m":-1.0}
+      "SPY":{"price":634.09,"sma50":580,"sma200":560,"trend_50":"above","trend_200":"above","chg_1w":-2.5,"chg_1m":-8.1,"chg_3m":-5.2},
+      "QQQ":{"price":562.58,"sma50":520,"sma200":500,"trend_50":"above","trend_200":"above","chg_1w":-3.1,"chg_1m":-10.2,"chg_3m":-7.8},
+      "BTC":{"price":66750,"sma50":70000,"sma200":65000,"trend_50":"below","trend_200":"above","chg_1w":-4.2,"chg_1m":-12.5,"chg_3m":-8.0},
+      "WTI":{"price":99.64,"sma50":85,"sma200":80,"trend_50":"above","trend_200":"above","chg_1w":5.2,"chg_1m":12.3,"chg_3m":18.5},
+      "TNX":{"price":4.44,"sma50":4.3,"sma200":4.2,"trend_50":"above","trend_200":"above","chg_1w":2.1,"chg_1m":5.0,"chg_3m":3.2},
+      "DXY":{"price":104.2,"sma50":103,"sma200":102,"trend_50":"above","trend_200":"above","chg_1w":0.8,"chg_1m":1.5,"chg_3m":2.0},
+      "GLD":{"price":285,"sma50":270,"sma200":260,"trend_50":"above","trend_200":"above","chg_1w":1.5,"chg_1m":4.2,"chg_3m":8.0},
+      "CPER":{"price":28,"sma50":27,"sma200":26,"trend_50":"above","trend_200":"above","chg_1w":-0.5,"chg_1m":-2.0,"chg_3m":-1.0}
     },
-    "copper_gold_ratio":0.0982,"relative_strength":"SPY","relative_spread":-2.1,
-    "btc_spy_correlation":0.65,
-    "rate_velocity_1w":5.2,
-    "wti_atr_pct":3.8
+    "copper_gold_ratio":0.0982,"relative_strength":"SPY","relative_spread":-2.1
   },
   "dim2_leaders":{
     "score":0.025,"above_50sma_count":1,"total":10,
-    "dispersion":8.5,
-    "failed_breakout_count":2,
     "leaders":{
-      "NVDA":{"price":110,"sma50":120,"trend_50":"below","rsi14":35,"chg_1w":-5,"chg_1m":-15,"chg_3m":-20,"high_52w_dist":-32.5,"failed_breakout":true},
-      "META":{"price":580,"sma50":600,"trend_50":"below","rsi14":38,"chg_1w":-3,"chg_1m":-10,"chg_3m":-8,"high_52w_dist":-8.2,"failed_breakout":false},
-      "AAPL":{"price":218,"sma50":230,"trend_50":"below","rsi14":40,"chg_1w":-2,"chg_1m":-8,"chg_3m":-5,"high_52w_dist":-12.5,"failed_breakout":false},
-      "MSFT":{"price":410,"sma50":420,"trend_50":"below","rsi14":42,"chg_1w":-1.5,"chg_1m":-6,"chg_3m":-4,"high_52w_dist":-10.1,"failed_breakout":false},
-      "AVGO":{"price":185,"sma50":200,"trend_50":"below","rsi14":33,"chg_1w":-6,"chg_1m":-18,"chg_3m":-22,"high_52w_dist":-35.0,"failed_breakout":true},
-      "GOOGL":{"price":170,"sma50":180,"trend_50":"below","rsi14":37,"chg_1w":-4,"chg_1m":-12,"chg_3m":-10,"high_52w_dist":-15.3,"failed_breakout":false},
-      "AMZN":{"price":195,"sma50":210,"trend_50":"below","rsi14":36,"chg_1w":-3.5,"chg_1m":-11,"chg_3m":-9,"high_52w_dist":-14.8,"failed_breakout":false},
-      "TSLA":{"price":260,"sma50":280,"trend_50":"below","rsi14":30,"chg_1w":-8,"chg_1m":-20,"chg_3m":-25,"high_52w_dist":-40.2,"failed_breakout":false},
-      "AMD":{"price":105,"sma50":115,"trend_50":"below","rsi14":32,"chg_1w":-5.5,"chg_1m":-16,"chg_3m":-18,"high_52w_dist":-38.1,"failed_breakout":false},
-      "CRM":{"price":280,"sma50":290,"trend_50":"below","rsi14":39,"chg_1w":-2.5,"chg_1m":-7,"chg_3m":-6,"high_52w_dist":-9.5,"failed_breakout":false}
+      "NVDA":{"price":110,"sma50":120,"trend_50":"below","rsi14":35,"chg_1w":-5,"chg_1m":-15,"chg_3m":-20},
+      "META":{"price":580,"sma50":600,"trend_50":"below","rsi14":38,"chg_1w":-3,"chg_1m":-10,"chg_3m":-8},
+      "AAPL":{"price":218,"sma50":230,"trend_50":"below","rsi14":40,"chg_1w":-2,"chg_1m":-8,"chg_3m":-5},
+      "MSFT":{"price":410,"sma50":420,"trend_50":"below","rsi14":42,"chg_1w":-1.5,"chg_1m":-6,"chg_3m":-4},
+      "AVGO":{"price":185,"sma50":200,"trend_50":"below","rsi14":33,"chg_1w":-6,"chg_1m":-18,"chg_3m":-22},
+      "GOOGL":{"price":170,"sma50":180,"trend_50":"below","rsi14":37,"chg_1w":-4,"chg_1m":-12,"chg_3m":-10},
+      "AMZN":{"price":195,"sma50":210,"trend_50":"below","rsi14":36,"chg_1w":-3.5,"chg_1m":-11,"chg_3m":-9},
+      "TSLA":{"price":260,"sma50":280,"trend_50":"below","rsi14":30,"chg_1w":-8,"chg_1m":-20,"chg_3m":-25},
+      "AMD":{"price":105,"sma50":115,"trend_50":"below","rsi14":32,"chg_1w":-5.5,"chg_1m":-16,"chg_3m":-18},
+      "CRM":{"price":280,"sma50":290,"trend_50":"below","rsi14":39,"chg_1w":-2.5,"chg_1m":-7,"chg_3m":-6}
     }
   },
   "dim3_vix":{
     "score":0.222,
     "vix":{"price":31.05,"sma50":22,"trend_50":"above","chg_1w":15,"chg_1m":40,"chg_3m":55},
     "vix3m":{"price":28,"sma50":24,"trend_50":"above","chg_1w":8,"chg_1m":20},
-    "zone":"fear","term_ratio":1.109,"term_structure":"backwardation","vol_cluster_count":3,
-    "spike_revert":{"peak":35.2,"current":31.05,"revert_pct":-11.8,"reverted":false},
-    "spy_divergence":"bearish_divergence"
+    "zone":"fear","term_ratio":1.109,"term_structure":"backwardation","vol_cluster_count":3
   },
   "dim4_breadth":{
     "score":0.136,"above_50sma":3,"positive_1m":0,"total":11,"best":"XLE","worst":"XLK",
-    "rotation":{
-      "defensive_avg":-2.5,
-      "offensive_avg":-9.8,
-      "signal":"risk_off"
-    },
     "sectors":{
-      "XLK":{"price":200,"sma50":220,"trend_50":"below","chg_1m":-12,"name":"科技 Technology","dist_50":-9.1,"dist_200":-5.3},
-      "XLF":{"price":44,"sma50":43,"trend_50":"above","chg_1m":-3,"name":"金融 Financials","dist_50":2.3,"dist_200":5.1},
-      "XLE":{"price":92,"sma50":88,"trend_50":"above","chg_1m":-1,"name":"能源 Energy","dist_50":4.5,"dist_200":8.2},
-      "XLV":{"price":148,"sma50":150,"trend_50":"below","chg_1m":-4,"name":"医疗 Healthcare","dist_50":-1.3,"dist_200":2.1},
-      "XLI":{"price":125,"sma50":128,"trend_50":"below","chg_1m":-5,"name":"工业 Industrials","dist_50":-2.3,"dist_200":1.5},
-      "XLP":{"price":80,"sma50":79,"trend_50":"above","chg_1m":-2,"name":"必需消费 Staples","dist_50":1.3,"dist_200":3.8},
-      "XLU":{"price":72,"sma50":73,"trend_50":"below","chg_1m":-3,"name":"公用事业 Utilities","dist_50":-1.4,"dist_200":0.5},
-      "XLY":{"price":188,"sma50":200,"trend_50":"below","chg_1m":-10,"name":"可选消费 Discretionary","dist_50":-6.0,"dist_200":-3.2},
-      "XLB":{"price":85,"sma50":87,"trend_50":"below","chg_1m":-5,"name":"材料 Materials","dist_50":-2.3,"dist_200":0.8},
-      "XLRE":{"price":40,"sma50":42,"trend_50":"below","chg_1m":-6,"name":"房地产 Real Estate","dist_50":-4.8,"dist_200":-2.1},
-      "XLC":{"price":90,"sma50":95,"trend_50":"below","chg_1m":-8,"name":"通信 Comm Services","dist_50":-5.3,"dist_200":-1.8}
+      "XLK":{"price":200,"sma50":220,"trend_50":"below","chg_1m":-12,"name":"科技 Technology"},
+      "XLF":{"price":44,"sma50":43,"trend_50":"above","chg_1m":-3,"name":"金融 Financials"},
+      "XLE":{"price":92,"sma50":88,"trend_50":"above","chg_1m":-1,"name":"能源 Energy"},
+      "XLV":{"price":148,"sma50":150,"trend_50":"below","chg_1m":-4,"name":"医疗 Healthcare"},
+      "XLI":{"price":125,"sma50":128,"trend_50":"below","chg_1m":-5,"name":"工业 Industrials"},
+      "XLP":{"price":80,"sma50":79,"trend_50":"above","chg_1m":-2,"name":"必需消费 Staples"},
+      "XLU":{"price":72,"sma50":73,"trend_50":"below","chg_1m":-3,"name":"公用事业 Utilities"},
+      "XLY":{"price":188,"sma50":200,"trend_50":"below","chg_1m":-10,"name":"可选消费 Discretionary"},
+      "XLB":{"price":85,"sma50":87,"trend_50":"below","chg_1m":-5,"name":"材料 Materials"},
+      "XLRE":{"price":40,"sma50":42,"trend_50":"below","chg_1m":-6,"name":"房地产 Real Estate"},
+      "XLC":{"price":90,"sma50":95,"trend_50":"below","chg_1m":-8,"name":"通信 Comm Services"}
     }
   },
   "dim5_macro":{
     "score":0.25,
     "notes":["Tariff escalation risk — broad trade war uncertainty","Fed policy path unclear — rate cuts delayed","Geopolitical: Middle East, China-Taiwan tensions","Liquidity cycle — mixed signals","Upcoming: FOMC, CPI, NFP — check calendar"],
-    "events":[{"date":"TBD","event":"FOMC Meeting","impact":"high"},{"date":"TBD","event":"CPI Release","impact":"high"},{"date":"TBD","event":"NFP / Jobs Report","impact":"medium"}],
-    "credit_spread_proxy":{
-      "value":0.85,
-      "hyg":{"price":78.50,"chg_1m":-1.2},
-      "lqd":{"price":108.30,"chg_1m":-0.5}
-    }
+    "events":[{"date":"TBD","event":"FOMC Meeting","impact":"high"},{"date":"TBD","event":"CPI Release","impact":"high"},{"date":"TBD","event":"NFP / Jobs Report","impact":"medium"}]
   },
   "prices":{"SPY":634.09,"QQQ":562.58,"BTC":66750,"VIX":31.05,"VIX3M":28,"WTI":99.64,"TNX":4.44,"DXY":104.2,"GLD":285,"CPER":28}
 };
@@ -1038,9 +811,9 @@ function manualRefresh() {
   btn.disabled = true;
   btn.textContent = '⏳ 刷新中...';
   status.textContent = '';
-
+  
   loadData();
-
+  
   setTimeout(() => {
     btn.disabled = false;
     btn.textContent = '⟳ 刷新数据 Refresh';

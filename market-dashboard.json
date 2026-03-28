@@ -1,22 +1,22 @@
 {
-  "timestamp": "2026-03-28T15:20:10.770667",
-  "overall": 0.131,
+  "timestamp": "2026-03-28T16:08:03.637149",
+  "overall": 0.183,
   "dimensions": {
-    "1_environment": 0.067,
-    "2_leaders": 0.025,
-    "3_vix": 0.222,
+    "1_environment": 0.153,
+    "2_leaders": 0.042,
+    "3_vix": 0.273,
     "4_breadth": 0.136,
     "5_macro": 0.25
   },
   "weights": {
     "1_environment": 0.25,
-    "2_leaders": 0.2,
-    "3_vix": 0.2,
-    "4_breadth": 0.2,
-    "5_macro": 0.15
+    "2_leaders": 0.15,
+    "3_vix": 0.25,
+    "4_breadth": 0.15,
+    "5_macro": 0.2
   },
   "dim1_environment": {
-    "score": 0.067,
+    "score": 0.153,
     "assets": {
       "SPY": {
         "price": 634.09,
@@ -24,6 +24,8 @@
         "sma200": 678.6758,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -6.69,
+        "dist_200": -6.57,
         "chg_1w": -2.23,
         "chg_1m": -8.01,
         "chg_3m": -8.15
@@ -34,19 +36,23 @@
         "sma200": 611.5192,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -7.24,
+        "dist_200": -8.0,
         "chg_1w": -3.35,
         "chg_1m": -7.66,
         "chg_3m": -9.83
       },
       "BTC": {
-        "price": 66988.9609,
-        "sma50": 68861.7495,
-        "sma200": 80191.7321,
+        "price": 66970.875,
+        "sma50": 68861.3878,
+        "sma200": 80191.5814,
         "trend_50": "below",
         "trend_200": "below",
-        "chg_1w": -5.54,
-        "chg_1m": -0.42,
-        "chg_3m": -24.83
+        "dist_50": -2.75,
+        "dist_200": -16.49,
+        "chg_1w": -5.56,
+        "chg_1m": -0.45,
+        "chg_3m": -24.85
       },
       "WTI": {
         "price": 99.64,
@@ -54,9 +60,12 @@
         "sma200": 65.2537,
         "trend_50": "above",
         "trend_200": "above",
+        "dist_50": 34.63,
+        "dist_200": 52.7,
         "chg_1w": 1.34,
         "chg_1m": 52.8,
-        "chg_3m": 70.76
+        "chg_3m": 70.76,
+        "atr_pct": 9.01
       },
       "TNX": {
         "price": 4.44,
@@ -64,6 +73,8 @@
         "sma200": 4.1402,
         "trend_50": "above",
         "trend_200": "above",
+        "dist_50": 5.89,
+        "dist_200": 7.24,
         "chg_1w": 1.12,
         "chg_1m": 10.53,
         "chg_3m": 7.35
@@ -74,6 +85,8 @@
         "sma200": 98.7119,
         "trend_50": "above",
         "trend_200": "above",
+        "dist_50": 1.89,
+        "dist_200": 1.46,
         "chg_1w": 0.5,
         "chg_1m": 2.41,
         "chg_3m": 2.21
@@ -84,6 +97,8 @@
         "sma200": 415.3897,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -8.85,
+        "dist_200": -0.17,
         "chg_1w": 0.32,
         "chg_1m": -13.15,
         "chg_3m": 0.67
@@ -94,6 +109,8 @@
         "sma200": 33.8923,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -6.24,
+        "dist_200": -1.31,
         "chg_1w": 3.4,
         "chg_1m": -8.93,
         "chg_3m": -2.19
@@ -101,10 +118,13 @@
     },
     "copper_gold_ratio": 0.0807,
     "relative_strength": "QQQ",
-    "relative_spread": 0.35
+    "relative_spread": 0.35,
+    "btc_spy_correlation": -0.044,
+    "rate_velocity_1w": 1.12,
+    "wti_atr_pct": 9.01
   },
   "dim2_leaders": {
-    "score": 0.025,
+    "score": 0.042,
     "leaders": {
       "NVDA": {
         "price": 167.52,
@@ -112,10 +132,14 @@
         "sma200": 185.0063,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -8.7,
+        "dist_200": -9.45,
         "chg_1w": -3.0,
         "chg_1m": -9.39,
         "chg_3m": -11.18,
-        "rsi14": 31.4
+        "rsi14": 31.4,
+        "high_52w_dist": -21.05,
+        "failed_breakout": false
       },
       "META": {
         "price": 525.72,
@@ -123,10 +147,14 @@
         "sma200": 654.7192,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -18.31,
+        "dist_200": -19.7,
         "chg_1w": -11.44,
         "chg_1m": -19.98,
         "chg_3m": -21.25,
-        "rsi14": 17.8
+        "rsi14": 17.8,
+        "high_52w_dist": -30.75,
+        "failed_breakout": false
       },
       "AAPL": {
         "price": 248.8,
@@ -134,10 +162,14 @@
         "sma200": 264.8775,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -4.41,
+        "dist_200": -6.07,
         "chg_1w": 0.33,
         "chg_1m": -8.85,
         "chg_3m": -9.13,
-        "rsi14": 32.1
+        "rsi14": 32.1,
+        "high_52w_dist": -13.8,
+        "failed_breakout": false
       },
       "MSFT": {
         "price": 356.77,
@@ -145,10 +177,14 @@
         "sma200": 460.958,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -13.08,
+        "dist_200": -22.6,
         "chg_1w": -6.57,
         "chg_1m": -11.19,
         "chg_3m": -26.89,
-        "rsi14": 8.7
+        "rsi14": 8.7,
+        "high_52w_dist": -35.57,
+        "failed_breakout": false
       },
       "AVGO": {
         "price": 300.68,
@@ -156,10 +192,14 @@
         "sma200": 344.5522,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -8.14,
+        "dist_200": -12.73,
         "chg_1w": -3.17,
         "chg_1m": -6.53,
         "chg_3m": -14.15,
-        "rsi14": 23.0
+        "rsi14": 23.0,
+        "high_52w_dist": -27.48,
+        "failed_breakout": false
       },
       "GOOGL": {
         "price": 274.34,
@@ -167,10 +207,14 @@
         "sma200": 301.3042,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -12.52,
+        "dist_200": -8.95,
         "chg_1w": -8.86,
         "chg_1m": -10.75,
         "chg_3m": -12.66,
-        "rsi14": 22.0
+        "rsi14": 22.0,
+        "high_52w_dist": -21.39,
+        "failed_breakout": false
       },
       "AMZN": {
         "price": 199.34,
@@ -178,10 +222,14 @@
         "sma200": 225.0105,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -8.22,
+        "dist_200": -11.41,
         "chg_1w": -2.94,
         "chg_1m": -4.13,
         "chg_3m": -14.22,
-        "rsi14": 35.7
+        "rsi14": 35.7,
+        "high_52w_dist": -22.92,
+        "failed_breakout": false
       },
       "TSLA": {
         "price": 361.83,
@@ -189,10 +237,14 @@
         "sma200": 428.7259,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -11.45,
+        "dist_200": -15.6,
         "chg_1w": -1.67,
         "chg_1m": -11.44,
         "chg_3m": -25.46,
-        "rsi14": 32.8
+        "rsi14": 32.8,
+        "high_52w_dist": -27.46,
+        "failed_breakout": false
       },
       "AMD": {
         "price": 201.99,
@@ -200,10 +252,14 @@
         "sma200": 220.8413,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -5.58,
+        "dist_200": -8.54,
         "chg_1w": 0.33,
         "chg_1m": -0.83,
         "chg_3m": -6.07,
-        "rsi14": 49.5
+        "rsi14": 49.5,
+        "high_52w_dist": -24.37,
+        "failed_breakout": true
       },
       "CRM": {
         "price": 179.31,
@@ -211,23 +267,31 @@
         "sma200": 228.8025,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -10.05,
+        "dist_200": -21.63,
         "chg_1w": -8.23,
         "chg_1m": -10.11,
         "chg_3m": -32.4,
-        "rsi14": 30.6
+        "rsi14": 30.6,
+        "high_52w_dist": -33.37,
+        "failed_breakout": false
       }
     },
     "above_50sma_count": 0,
-    "total": 10
+    "total": 10,
+    "dispersion": 4.81,
+    "failed_breakout_count": 1
   },
   "dim3_vix": {
-    "score": 0.222,
+    "score": 0.273,
     "vix": {
       "price": 31.05,
       "sma50": 21.1282,
       "sma200": 19.0033,
       "trend_50": "above",
       "trend_200": "above",
+      "dist_50": 46.96,
+      "dist_200": 63.39,
       "chg_1w": 15.94,
       "chg_1m": 66.67,
       "chg_3m": 130.51
@@ -238,6 +302,8 @@
       "sma200": 21.1238,
       "trend_50": "above",
       "trend_200": "above",
+      "dist_50": 29.79,
+      "dist_200": 38.56,
       "chg_1w": 6.71,
       "chg_1m": 40.65,
       "chg_3m": 64.72
@@ -245,7 +311,14 @@
     "zone": "fear",
     "term_ratio": 1.061,
     "term_structure": "backwardation",
-    "vol_cluster_count": 0
+    "vol_cluster_count": 0,
+    "spike_revert": {
+      "peak": 31.05,
+      "current": 31.05,
+      "revert_pct": 0.0,
+      "reverted": false
+    },
+    "spy_divergence": "none"
   },
   "dim4_breadth": {
     "score": 0.136,
@@ -256,6 +329,8 @@
         "sma200": 142.9191,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -7.53,
+        "dist_200": -9.1,
         "chg_1w": -3.97,
         "chg_1m": -7.86,
         "chg_3m": -11.2,
@@ -267,6 +342,8 @@
         "sma200": 52.7555,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -7.44,
+        "dist_200": -9.37,
         "chg_1w": -2.59,
         "chg_1m": -8.93,
         "chg_3m": -14.21,
@@ -278,6 +355,8 @@
         "sma200": 48.8794,
         "trend_50": "above",
         "trend_200": "above",
+        "dist_50": 14.54,
+        "dist_200": 27.99,
         "chg_1w": 5.48,
         "chg_1m": 13.64,
         "chg_3m": 41.0,
@@ -289,6 +368,8 @@
         "sma200": 152.2703,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -7.01,
+        "dist_200": -5.92,
         "chg_1w": -1.42,
         "chg_1m": -9.0,
         "chg_3m": -8.05,
@@ -300,6 +381,8 @@
         "sma200": 160.8743,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -5.99,
+        "dist_200": -1.04,
         "chg_1w": -1.53,
         "chg_1m": -9.9,
         "chg_3m": 1.08,
@@ -311,6 +394,8 @@
         "sma200": 81.1204,
         "trend_50": "below",
         "trend_200": "above",
+        "dist_50": -4.08,
+        "dist_200": 0.81,
         "chg_1w": 0.6,
         "chg_1m": -7.97,
         "chg_3m": 4.69,
@@ -322,6 +407,8 @@
         "sma200": 44.5551,
         "trend_50": "above",
         "trend_200": "above",
+        "dist_50": 0.81,
+        "dist_200": 2.32,
         "chg_1w": 2.11,
         "chg_1m": -3.37,
         "chg_3m": 6.49,
@@ -333,6 +420,8 @@
         "sma200": 117.864,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -9.14,
+        "dist_200": -10.34,
         "chg_1w": -1.91,
         "chg_1m": -9.71,
         "chg_3m": -13.79,
@@ -344,6 +433,8 @@
         "sma200": 47.1253,
         "trend_50": "below",
         "trend_200": "above",
+        "dist_50": -3.42,
+        "dist_200": 3.79,
         "chg_1w": 4.11,
         "chg_1m": -7.72,
         "chg_3m": 6.7,
@@ -355,6 +446,8 @@
         "sma200": 41.5272,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -5.19,
+        "dist_200": -3.65,
         "chg_1w": -1.43,
         "chg_1m": -8.3,
         "chg_3m": -1.06,
@@ -366,6 +459,8 @@
         "sma200": 115.4937,
         "trend_50": "below",
         "trend_200": "below",
+        "dist_50": -7.52,
+        "dist_200": -7.32,
         "chg_1w": -4.62,
         "chg_1m": -8.29,
         "chg_3m": -9.36,
@@ -376,7 +471,13 @@
     "positive_1m": 1,
     "total": 11,
     "best": "XLE",
-    "worst": "XLI"
+    "worst": "XLI",
+    "rotation": {
+      "defensive_avg": -6.78,
+      "offensive_avg": -8.62,
+      "spread": 1.84,
+      "signal": "neutral"
+    }
   },
   "dim5_macro": {
     "score": 0.25,
@@ -403,18 +504,45 @@
         "event": "NFP / Jobs Report",
         "impact": "medium"
       }
-    ]
+    ],
+    "credit_spread_proxy": 1.04,
+    "hyg": {
+      "price": 78.72,
+      "sma50": 80.392,
+      "sma200": 80.5327,
+      "trend_50": "below",
+      "trend_200": "below",
+      "dist_50": -2.08,
+      "dist_200": -2.25,
+      "chg_1w": -0.25,
+      "chg_1m": -2.63,
+      "chg_3m": -2.38
+    },
+    "lqd": {
+      "price": 107.62,
+      "sma50": 110.2672,
+      "sma200": 110.7414,
+      "trend_50": "below",
+      "trend_200": "below",
+      "dist_50": -2.4,
+      "dist_200": -2.82,
+      "chg_1w": -0.21,
+      "chg_1m": -3.67,
+      "chg_3m": -2.74
+    }
   },
   "prices": {
     "SPY": 634.09,
     "QQQ": 562.58,
-    "BTC": 66988.9609,
+    "BTC": 66970.875,
     "VIX": 31.05,
     "VIX3M": 29.27,
     "WTI": 99.64,
     "TNX": 4.44,
     "DXY": 100.15,
     "GLD": 414.7,
-    "CPER": 33.45
+    "CPER": 33.45,
+    "HYG": 78.72,
+    "LQD": 107.62
   }
 }
