@@ -8,14 +8,14 @@
 /* ── Reset & Base ───────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0c0c14;--bg2:#141420;--bg3:#1c1c2e;--bg4:#252538;
-  --border:#2e2e48;--border-glow:#3d3d5c;
-  --text:#c8c8d8;--text-dim:#7a7a96;--text-muted:#505068;
-  --neon-cyan:#5cb8c4;--neon-pink:#c4609a;--neon-green:#4db882;
-  --neon-red:#c45060;--neon-yellow:#c4a84d;--neon-orange:#c4884d;
-  --neon-purple:#8a5cb8;
-  --green:#4da876;--red:#b8505e;--yellow:#b8a04d;
-  --font-mono:'Courier New',Consolas,monospace;
+  --bg:#131722;--bg2:#1e222d;--bg3:#252a37;--bg4:#2a2e39;
+  --border:#363a45;--border-glow:#434651;
+  --text:#d1d4dc;--text-dim:#787b86;--text-muted:#555a64;
+  --neon-cyan:#2962ff;--neon-pink:#ab47bc;--neon-green:#26a69a;
+  --neon-red:#ef5350;--neon-yellow:#f7b84e;--neon-orange:#e88a3a;
+  --neon-purple:#7e57c2;
+  --green:#26a69a;--red:#ef5350;--yellow:#f7b84e;
+  --font-mono:'Trebuchet MS','Lucida Sans',Consolas,monospace;
   --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
 html{font-size:14px;scroll-behavior:smooth}
@@ -25,13 +25,7 @@ body{
 }
 a{color:var(--neon-cyan);text-decoration:none}
 
-/* ── Scanline overlay ───────────────────────────────────────── */
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-  background:repeating-linear-gradient(
-    0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px
-  );
-}
+/* ── (scanline removed — clean style) ─── */
 
 /* ── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar{width:6px}
@@ -48,7 +42,7 @@ body::after{
 }
 .header h1{
   font-family:var(--font-mono);font-size:1.4rem;letter-spacing:2px;
-  color:var(--neon-cyan);text-shadow:0 0 10px rgba(92,184,196,.15);
+  color:var(--neon-cyan);
 }
 .header .subtitle{color:var(--text-dim);font-size:.8rem;margin-top:4px}
 .header .timestamp{color:var(--text-muted);font-size:.7rem;margin-top:8px;font-family:var(--font-mono)}
@@ -60,17 +54,17 @@ body::after{
 }
 .score-banner::before{
   content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,rgba(92,184,196,.03) 0%,transparent 70%);
+  background:none;
 }
 .score-label{font-size:.85rem;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:3px}
 .score-value{
   font-family:var(--font-mono);font-size:4rem;font-weight:700;
   transition:color .6s;position:relative;
 }
-.score-value.green{color:var(--neon-green);text-shadow:0 0 15px rgba(77,184,130,.2)}
-.score-value.yellow{color:var(--neon-yellow);text-shadow:0 0 15px rgba(196,168,77,.2)}
-.score-value.orange{color:var(--neon-orange);text-shadow:0 0 15px rgba(196,136,77,.2)}
-.score-value.red{color:var(--neon-red);text-shadow:0 0 15px rgba(196,80,96,.2)}
+.score-value.green{color:var(--neon-green)}
+.score-value.yellow{color:var(--neon-yellow)}
+.score-value.orange{color:var(--neon-orange)}
+.score-value.red{color:var(--neon-red)}
 .score-recommendation{
   font-size:.9rem;margin-top:8px;padding:8px 16px;
   border-radius:6px;display:inline-block;font-family:var(--font-mono);
@@ -140,9 +134,9 @@ body::after{
   display:inline-block;padding:1px 6px;border-radius:3px;font-size:.65rem;
   font-family:var(--font-mono);margin-left:4px;
 }
-.tag.above{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.below{background:rgba(238,51,68,.15);color:var(--red)}
-.tag.neutral{background:rgba(136,136,170,.15);color:var(--text-dim)}
+.tag.above{background:rgba(38,166,154,.15);color:var(--green)}
+.tag.below{background:rgba(239,83,80,.15);color:var(--red)}
+.tag.neutral{background:rgba(85,90,100,.2);color:var(--text-dim)}
 
 /* ── v2: SMA distance inline ──────────────────────────────── */
 .sma-dist{font-size:.6rem;font-family:var(--font-mono);margin-left:2px}
@@ -150,12 +144,12 @@ body::after{
 .sma-dist.neg{color:var(--red)}
 
 /* ── v2: Correlation / Velocity / ATR tags ────────────────── */
-.tag.high{background:rgba(255,51,85,.15);color:var(--red)}
-.tag.medium{background:rgba(238,187,0,.15);color:var(--yellow)}
-.tag.low{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.calm{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.volatile{background:rgba(255,51,85,.15);color:var(--red)}
-.tag.normal-tag{background:rgba(238,187,0,.15);color:var(--yellow)}
+.tag.high{background:rgba(239,83,80,.15);color:var(--red)}
+.tag.medium{background:rgba(247,184,78,.15);color:var(--yellow)}
+.tag.low{background:rgba(38,166,154,.15);color:var(--green)}
+.tag.calm{background:rgba(38,166,154,.15);color:var(--green)}
+.tag.volatile{background:rgba(239,83,80,.15);color:var(--red)}
+.tag.normal-tag{background:rgba(247,184,78,.15);color:var(--yellow)}
 
 /* ── v2: Dispersion bar ───────────────────────────────────── */
 .dispersion-bar{
@@ -167,16 +161,16 @@ body::after{
 .dispersion-bar .disp-value{font-weight:700}
 
 /* ── v2: Failed breakout tag ──────────────────────────────── */
-.tag.fb{background:rgba(255,51,85,.2);color:var(--neon-red);font-weight:700}
+.tag.fb{background:rgba(239,83,80,.2);color:var(--neon-red);font-weight:700}
 
 /* ── v2: 52W distance in leader chips ─────────────────────── */
 .leader-chip .l52w{font-size:.6rem;color:var(--text-muted);margin-top:2px}
 
 /* ── v2: Spike revert / divergence ────────────────────────── */
-.tag.reverted{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.not-reverted{background:rgba(255,136,0,.15);color:var(--neon-orange)}
-.tag.bullish-div{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.bearish-div{background:rgba(255,51,85,.15);color:var(--red)}
+.tag.reverted{background:rgba(38,166,154,.15);color:var(--green)}
+.tag.not-reverted{background:rgba(232,138,58,.15);color:var(--neon-orange)}
+.tag.bullish-div{background:rgba(38,166,154,.15);color:var(--green)}
+.tag.bearish-div{background:rgba(239,83,80,.15);color:var(--red)}
 
 /* ── v2: Rotation section ─────────────────────────────────── */
 .rotation-section{
@@ -192,15 +186,15 @@ body::after{
 }
 .rotation-row .rot-label{color:var(--text-dim)}
 .rotation-row .rot-val{font-weight:600}
-.tag.risk-off{background:rgba(255,51,85,.15);color:var(--red)}
-.tag.risk-on{background:rgba(0,204,102,.15);color:var(--green)}
+.tag.risk-off{background:rgba(239,83,80,.15);color:var(--red)}
+.tag.risk-on{background:rgba(38,166,154,.15);color:var(--green)}
 
 /* ── v2: Sector dist inline ───────────────────────────────── */
 .sector-dist{font-size:.55rem;color:var(--text-muted);font-family:var(--font-mono)}
 
 /* ── v2: Credit spread ────────────────────────────────────── */
-.tag.healthy{background:rgba(0,204,102,.15);color:var(--green)}
-.tag.tightening{background:rgba(255,51,85,.15);color:var(--red)}
+.tag.healthy{background:rgba(38,166,154,.15);color:var(--green)}
+.tag.tightening{background:rgba(239,83,80,.15);color:var(--red)}
 
 /* ── Leader Grid ────────────────────────────────────────────── */
 .leader-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px}
@@ -209,8 +203,8 @@ body::after{
   padding:8px;text-align:center;font-family:var(--font-mono);font-size:.72rem;
   transition:border-color .3s;
 }
-.leader-chip.bullish{border-color:rgba(0,204,102,.4)}
-.leader-chip.bearish{border-color:rgba(238,51,68,.4)}
+.leader-chip.bullish{border-color:rgba(38,166,154,.35)}
+.leader-chip.bearish{border-color:rgba(239,83,80,.35)}
 .leader-chip .lsym{font-weight:700;color:var(--neon-cyan);font-size:.8rem}
 .leader-chip .lpx{margin:2px 0}
 .leader-chip .ltags{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
@@ -222,8 +216,8 @@ body::after{
 .sector-row .sname{width:80px;color:var(--text-dim);text-align:right;flex-shrink:0}
 .sector-bar-wrap{flex:1;height:14px;background:var(--bg4);border-radius:3px;overflow:hidden;position:relative}
 .sector-bar{height:100%;border-radius:3px;transition:width .8s ease;min-width:2px}
-.sector-bar.pos{background:linear-gradient(90deg,rgba(0,204,102,.6),var(--green))}
-.sector-bar.neg{background:linear-gradient(90deg,var(--red),rgba(238,51,68,.6))}
+.sector-bar.pos{background:linear-gradient(90deg,rgba(38,166,154,.5),var(--green))}
+.sector-bar.neg{background:linear-gradient(90deg,var(--red),rgba(239,83,80,.5))}
 .sector-row .sval{width:55px;font-family:var(--font-mono);font-weight:600;text-align:right;flex-shrink:0}
 .sector-row .stag{width:18px;text-align:center;flex-shrink:0}
 
@@ -238,10 +232,10 @@ body::after{
   padding:4px 12px;border-radius:6px;font-size:.75rem;font-weight:600;
   text-transform:uppercase;letter-spacing:1px;
 }
-.zone-complacent{background:rgba(0,204,102,.2);color:var(--green)}
-.zone-normal{background:rgba(238,187,0,.2);color:var(--yellow)}
-.zone-elevated{background:rgba(255,136,0,.2);color:var(--neon-orange)}
-.zone-fear{background:rgba(255,51,85,.2);color:var(--red)}
+.zone-complacent{background:rgba(38,166,154,.2);color:var(--green)}
+.zone-normal{background:rgba(247,184,78,.2);color:var(--yellow)}
+.zone-elevated{background:rgba(232,138,58,.2);color:var(--neon-orange)}
+.zone-fear{background:rgba(239,83,80,.2);color:var(--red)}
 
 /* ── Macro Notes ────────────────────────────────────────────── */
 .macro-note{
@@ -259,8 +253,8 @@ body::after{
   padding:1px 6px;border-radius:3px;font-size:.6rem;font-weight:700;
   text-transform:uppercase;font-family:var(--font-mono);
 }
-.impact-high{background:rgba(255,51,85,.2);color:var(--red)}
-.impact-medium{background:rgba(238,187,0,.2);color:var(--yellow)}
+.impact-high{background:rgba(239,83,80,.2);color:var(--red)}
+.impact-medium{background:rgba(247,184,78,.2);color:var(--yellow)}
 
 /* ── Position Sizing Calculator ─────────────────────────────── */
 .calc-section{
@@ -287,7 +281,7 @@ input[type=range]{
 input[type=range]::-webkit-slider-thumb{
   -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
   background:var(--neon-cyan);cursor:pointer;
-  box-shadow:0 0 6px rgba(92,184,196,.3);
+  box-shadow:0 0 4px rgba(41,98,255,.3);
 }
 .result-card{
   background:var(--bg3);border-radius:8px;padding:16px;text-align:center;
@@ -311,7 +305,7 @@ input[type=range]::-webkit-slider-thumb{
   text-align:left;padding:4px 8px;color:var(--text-muted);border-bottom:1px solid var(--border);
 }
 .sizing-table td{padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
-.sizing-table tr.active{background:rgba(0,240,255,.08)}
+.sizing-table tr.active{background:rgba(41,98,255,.1)}
 .sizing-table .no-trade{color:var(--text-muted)}
 
 /* ── Editable textarea for macro ────────────────────────────── */
@@ -863,16 +857,16 @@ function recalcOverall(){
   const rec=document.getElementById('overall-rec');
   if(overall>=0.7){
     rec.textContent='🟢 环境强势 — 正常仓位交易';
-    rec.style.background='rgba(0,204,102,.15)';rec.style.color='var(--green)';
+    rec.style.background='rgba(38,166,154,.15)';rec.style.color='var(--green)';
   }else if(overall>=0.5){
     rec.textContent='🟡 环境中性 — 减仓操作';
-    rec.style.background='rgba(238,187,0,.15)';rec.style.color='var(--yellow)';
+    rec.style.background='rgba(247,184,78,.15)';rec.style.color='var(--yellow)';
   }else if(overall>=0.3){
     rec.textContent='🟠 环境偏弱 — 仅最小仓位';
-    rec.style.background='rgba(255,136,0,.15)';rec.style.color='var(--neon-orange)';
+    rec.style.background='rgba(232,138,58,.15)';rec.style.color='var(--neon-orange)';
   }else{
     rec.textContent='🔴 环境恶劣 — 观望或对冲';
-    rec.style.background='rgba(255,51,85,.15)';rec.style.color='var(--red)';
+    rec.style.background='rgba(239,83,80,.15)';rec.style.color='var(--red)';
   }
 }
 
