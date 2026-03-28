@@ -1,0 +1,420 @@
+{
+  "timestamp": "2026-03-28T15:20:10.770667",
+  "overall": 0.131,
+  "dimensions": {
+    "1_environment": 0.067,
+    "2_leaders": 0.025,
+    "3_vix": 0.222,
+    "4_breadth": 0.136,
+    "5_macro": 0.25
+  },
+  "weights": {
+    "1_environment": 0.25,
+    "2_leaders": 0.2,
+    "3_vix": 0.2,
+    "4_breadth": 0.2,
+    "5_macro": 0.15
+  },
+  "dim1_environment": {
+    "score": 0.067,
+    "assets": {
+      "SPY": {
+        "price": 634.09,
+        "sma50": 679.5246,
+        "sma200": 678.6758,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -2.23,
+        "chg_1m": -8.01,
+        "chg_3m": -8.15
+      },
+      "QQQ": {
+        "price": 562.58,
+        "sma50": 606.47,
+        "sma200": 611.5192,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -3.35,
+        "chg_1m": -7.66,
+        "chg_3m": -9.83
+      },
+      "BTC": {
+        "price": 66988.9609,
+        "sma50": 68861.7495,
+        "sma200": 80191.7321,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -5.54,
+        "chg_1m": -0.42,
+        "chg_3m": -24.83
+      },
+      "WTI": {
+        "price": 99.64,
+        "sma50": 74.01,
+        "sma200": 65.2537,
+        "trend_50": "above",
+        "trend_200": "above",
+        "chg_1w": 1.34,
+        "chg_1m": 52.8,
+        "chg_3m": 70.76
+      },
+      "TNX": {
+        "price": 4.44,
+        "sma50": 4.1929,
+        "sma200": 4.1402,
+        "trend_50": "above",
+        "trend_200": "above",
+        "chg_1w": 1.12,
+        "chg_1m": 10.53,
+        "chg_3m": 7.35
+      },
+      "DXY": {
+        "price": 100.15,
+        "sma50": 98.2968,
+        "sma200": 98.7119,
+        "trend_50": "above",
+        "trend_200": "above",
+        "chg_1w": 0.5,
+        "chg_1m": 2.41,
+        "chg_3m": 2.21
+      },
+      "GLD": {
+        "price": 414.7,
+        "sma50": 454.9682,
+        "sma200": 415.3897,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": 0.32,
+        "chg_1m": -13.15,
+        "chg_3m": 0.67
+      },
+      "CPER": {
+        "price": 33.45,
+        "sma50": 35.675,
+        "sma200": 33.8923,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": 3.4,
+        "chg_1m": -8.93,
+        "chg_3m": -2.19
+      }
+    },
+    "copper_gold_ratio": 0.0807,
+    "relative_strength": "QQQ",
+    "relative_spread": 0.35
+  },
+  "dim2_leaders": {
+    "score": 0.025,
+    "leaders": {
+      "NVDA": {
+        "price": 167.52,
+        "sma50": 183.4902,
+        "sma200": 185.0063,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -3.0,
+        "chg_1m": -9.39,
+        "chg_3m": -11.18,
+        "rsi14": 31.4
+      },
+      "META": {
+        "price": 525.72,
+        "sma50": 643.5608,
+        "sma200": 654.7192,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -11.44,
+        "chg_1m": -19.98,
+        "chg_3m": -21.25,
+        "rsi14": 17.8
+      },
+      "AAPL": {
+        "price": 248.8,
+        "sma50": 260.2854,
+        "sma200": 264.8775,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": 0.33,
+        "chg_1m": -8.85,
+        "chg_3m": -9.13,
+        "rsi14": 32.1
+      },
+      "MSFT": {
+        "price": 356.77,
+        "sma50": 410.4704,
+        "sma200": 460.958,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -6.57,
+        "chg_1m": -11.19,
+        "chg_3m": -26.89,
+        "rsi14": 8.7
+      },
+      "AVGO": {
+        "price": 300.68,
+        "sma50": 327.335,
+        "sma200": 344.5522,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -3.17,
+        "chg_1m": -6.53,
+        "chg_3m": -14.15,
+        "rsi14": 23.0
+      },
+      "GOOGL": {
+        "price": 274.34,
+        "sma50": 313.5998,
+        "sma200": 301.3042,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -8.86,
+        "chg_1m": -10.75,
+        "chg_3m": -12.66,
+        "rsi14": 22.0
+      },
+      "AMZN": {
+        "price": 199.34,
+        "sma50": 217.199,
+        "sma200": 225.0105,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -2.94,
+        "chg_1m": -4.13,
+        "chg_3m": -14.22,
+        "rsi14": 35.7
+      },
+      "TSLA": {
+        "price": 361.83,
+        "sma50": 408.6372,
+        "sma200": 428.7259,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -1.67,
+        "chg_1m": -11.44,
+        "chg_3m": -25.46,
+        "rsi14": 32.8
+      },
+      "AMD": {
+        "price": 201.99,
+        "sma50": 213.9224,
+        "sma200": 220.8413,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": 0.33,
+        "chg_1m": -0.83,
+        "chg_3m": -6.07,
+        "rsi14": 49.5
+      },
+      "CRM": {
+        "price": 179.31,
+        "sma50": 199.3476,
+        "sma200": 228.8025,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -8.23,
+        "chg_1m": -10.11,
+        "chg_3m": -32.4,
+        "rsi14": 30.6
+      }
+    },
+    "above_50sma_count": 0,
+    "total": 10
+  },
+  "dim3_vix": {
+    "score": 0.222,
+    "vix": {
+      "price": 31.05,
+      "sma50": 21.1282,
+      "sma200": 19.0033,
+      "trend_50": "above",
+      "trend_200": "above",
+      "chg_1w": 15.94,
+      "chg_1m": 66.67,
+      "chg_3m": 130.51
+    },
+    "vix3m": {
+      "price": 29.27,
+      "sma50": 22.5512,
+      "sma200": 21.1238,
+      "trend_50": "above",
+      "trend_200": "above",
+      "chg_1w": 6.71,
+      "chg_1m": 40.65,
+      "chg_3m": 64.72
+    },
+    "zone": "fear",
+    "term_ratio": 1.061,
+    "term_structure": "backwardation",
+    "vol_cluster_count": 0
+  },
+  "dim4_breadth": {
+    "score": 0.136,
+    "sectors": {
+      "XLK": {
+        "price": 129.92,
+        "sma50": 140.4998,
+        "sma200": 142.9191,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -3.97,
+        "chg_1m": -7.86,
+        "chg_3m": -11.2,
+        "name": "\u79d1\u6280 Technology"
+      },
+      "XLF": {
+        "price": 47.81,
+        "sma50": 51.6506,
+        "sma200": 52.7555,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -2.59,
+        "chg_1m": -8.93,
+        "chg_3m": -14.21,
+        "name": "\u91d1\u878d Financials"
+      },
+      "XLE": {
+        "price": 62.56,
+        "sma50": 54.6202,
+        "sma200": 48.8794,
+        "trend_50": "above",
+        "trend_200": "above",
+        "chg_1w": 5.48,
+        "chg_1m": 13.64,
+        "chg_3m": 41.0,
+        "name": "\u80fd\u6e90 Energy"
+      },
+      "XLV": {
+        "price": 143.26,
+        "sma50": 154.0628,
+        "sma200": 152.2703,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -1.42,
+        "chg_1m": -9.0,
+        "chg_3m": -8.05,
+        "name": "\u533b\u7597 Healthcare"
+      },
+      "XLI": {
+        "price": 159.2,
+        "sma50": 169.3526,
+        "sma200": 160.8743,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -1.53,
+        "chg_1m": -9.9,
+        "chg_3m": 1.08,
+        "name": "\u5de5\u4e1a Industrials"
+      },
+      "XLP": {
+        "price": 81.78,
+        "sma50": 85.2608,
+        "sma200": 81.1204,
+        "trend_50": "below",
+        "trend_200": "above",
+        "chg_1w": 0.6,
+        "chg_1m": -7.97,
+        "chg_3m": 4.69,
+        "name": "\u5fc5\u9700\u6d88\u8d39 Staples"
+      },
+      "XLU": {
+        "price": 45.59,
+        "sma50": 45.2238,
+        "sma200": 44.5551,
+        "trend_50": "above",
+        "trend_200": "above",
+        "chg_1w": 2.11,
+        "chg_1m": -3.37,
+        "chg_3m": 6.49,
+        "name": "\u516c\u7528\u4e8b\u4e1a Utilities"
+      },
+      "XLY": {
+        "price": 105.68,
+        "sma50": 116.3108,
+        "sma200": 117.864,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -1.91,
+        "chg_1m": -9.71,
+        "chg_3m": -13.79,
+        "name": "\u53ef\u9009\u6d88\u8d39 Discretionary"
+      },
+      "XLB": {
+        "price": 48.91,
+        "sma50": 50.642,
+        "sma200": 47.1253,
+        "trend_50": "below",
+        "trend_200": "above",
+        "chg_1w": 4.11,
+        "chg_1m": -7.72,
+        "chg_3m": 6.7,
+        "name": "\u6750\u6599 Materials"
+      },
+      "XLRE": {
+        "price": 40.01,
+        "sma50": 42.2,
+        "sma200": 41.5272,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -1.43,
+        "chg_1m": -8.3,
+        "chg_3m": -1.06,
+        "name": "\u623f\u5730\u4ea7 Real Estate"
+      },
+      "XLC": {
+        "price": 107.04,
+        "sma50": 115.7468,
+        "sma200": 115.4937,
+        "trend_50": "below",
+        "trend_200": "below",
+        "chg_1w": -4.62,
+        "chg_1m": -8.29,
+        "chg_3m": -9.36,
+        "name": "\u901a\u4fe1 Comm Services"
+      }
+    },
+    "above_50sma": 2,
+    "positive_1m": 1,
+    "total": 11,
+    "best": "XLE",
+    "worst": "XLI"
+  },
+  "dim5_macro": {
+    "score": 0.25,
+    "notes": [
+      "Tariff escalation risk \u2014 broad trade war uncertainty",
+      "Fed policy path unclear \u2014 rate cuts delayed",
+      "Geopolitical: Middle East, China-Taiwan tensions",
+      "Liquidity cycle \u2014 mixed signals",
+      "Upcoming: FOMC, CPI, NFP \u2014 check calendar"
+    ],
+    "events": [
+      {
+        "date": "TBD",
+        "event": "FOMC Meeting",
+        "impact": "high"
+      },
+      {
+        "date": "TBD",
+        "event": "CPI Release",
+        "impact": "high"
+      },
+      {
+        "date": "TBD",
+        "event": "NFP / Jobs Report",
+        "impact": "medium"
+      }
+    ]
+  },
+  "prices": {
+    "SPY": 634.09,
+    "QQQ": 562.58,
+    "BTC": 66988.9609,
+    "VIX": 31.05,
+    "VIX3M": 29.27,
+    "WTI": 99.64,
+    "TNX": 4.44,
+    "DXY": 100.15,
+    "GLD": 414.7,
+    "CPER": 33.45
+  }
+}

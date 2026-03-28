@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐭 大鼠市场风控仪表盘 | Market Risk Dashboard</title>
+<style>
+/* ── Reset & Base ───────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a28;--bg4:#22223a;
+  --border:#2a2a44;--border-glow:#3a3a66;
+  --text:#e0e0f0;--text-dim:#8888aa;--text-muted:#555577;
+  --neon-cyan:#00f0ff;--neon-pink:#ff00aa;--neon-green:#00ff88;
+  --neon-red:#ff3355;--neon-yellow:#ffcc00;--neon-orange:#ff8800;
+  --neon-purple:#aa44ff;
+  --green:#00cc66;--red:#ee3344;--yellow:#eebb00;
+  --font-mono:'Courier New',Consolas,monospace;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font-sans);
+  min-height:100vh;overflow-x:hidden;
+}
+a{color:var(--neon-cyan);text-decoration:none}
+
+/* ── Scanline overlay ───────────────────────────────────────── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px
+  );
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border-glow);border-radius:3px}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.container{max-width:1440px;margin:0 auto;padding:16px 20px}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.header{
+  text-align:center;padding:24px 0 16px;
+  border-bottom:1px solid var(--border);margin-bottom:20px;
+}
+.header h1{
+  font-family:var(--font-mono);font-size:1.4rem;letter-spacing:2px;
+  color:var(--neon-cyan);text-shadow:0 0 20px rgba(0,240,255,.3);
+}
+.header .subtitle{color:var(--text-dim);font-size:.8rem;margin-top:4px}
+.header .timestamp{color:var(--text-muted);font-size:.7rem;margin-top:8px;font-family:var(--font-mono)}
+
+/* ── Overall Score Banner ───────────────────────────────────── */
+.score-banner{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:24px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;
+}
+.score-banner::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(0,240,255,.05) 0%,transparent 70%);
+}
+.score-label{font-size:.85rem;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:3px}
+.score-value{
+  font-family:var(--font-mono);font-size:4rem;font-weight:700;
+  transition:color .6s;position:relative;
+}
+.score-value.green{color:var(--neon-green);text-shadow:0 0 30px rgba(0,255,136,.4)}
+.score-value.yellow{color:var(--neon-yellow);text-shadow:0 0 30px rgba(255,204,0,.4)}
+.score-value.orange{color:var(--neon-orange);text-shadow:0 0 30px rgba(255,136,0,.4)}
+.score-value.red{color:var(--neon-red);text-shadow:0 0 30px rgba(255,51,85,.4)}
+.score-recommendation{
+  font-size:.9rem;margin-top:8px;padding:8px 16px;
+  border-radius:6px;display:inline-block;font-family:var(--font-mono);
+}
+
+/* ── Gauge Ring ─────────────────────────────────────────────── */
+.gauge-wrap{display:inline-block;position:relative;width:180px;height:180px;margin:0 auto 8px}
+.gauge-svg{transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:var(--bg4);stroke-width:10}
+.gauge-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.2s ease,stroke .6s}
+.gauge-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:2.6rem;font-weight:700;
+}
+
+/* ── Price Ticker Strip ─────────────────────────────────────── */
+.ticker-strip{
+  display:flex;gap:12px;overflow-x:auto;padding:8px 0;margin-bottom:16px;
+  scrollbar-width:none;
+}
+.ticker-strip::-webkit-scrollbar{display:none}
+.ticker-item{
+  flex-shrink:0;background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;padding:8px 14px;min-width:110px;text-align:center;
+  font-family:var(--font-mono);font-size:.75rem;
+}
+.ticker-item .sym{color:var(--neon-cyan);font-weight:700;margin-bottom:2px}
+.ticker-item .px{font-size:1rem;color:var(--text)}
+.ticker-item .chg{font-size:.7rem}
+.chg.up{color:var(--green)}.chg.down{color:var(--red)}
+
+/* ── Dimension Grid ─────────────────────────────────────────── */
+.dim-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
+  gap:16px;margin-bottom:20px;
+}
+
+/* ── Dimension Card ─────────────────────────────────────────── */
+.dim-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:16px;position:relative;overflow:hidden;
+  transition:border-color .3s;
+}
+.dim-card:hover{border-color:var(--border-glow)}
+.dim-card .dim-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dim-card .dim-title{font-size:.9rem;font-weight:600;color:var(--neon-cyan)}
+.dim-card .dim-score-badge{
+  font-family:var(--font-mono);font-size:1.1rem;font-weight:700;
+  padding:2px 10px;border-radius:6px;
+}
+.dim-score-bar{
+  height:4px;background:var(--bg4);border-radius:2px;margin-bottom:12px;overflow:hidden;
+}
+.dim-score-bar .fill{height:100%;border-radius:2px;transition:width 1s ease,background .6s}
+
+/* ── Sub-metric rows ────────────────────────────────────────── */
+.metric-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);
+  font-size:.78rem;
+}
+.metric-row:last-child{border-bottom:none}
+.metric-row .label{color:var(--text-dim)}
+.metric-row .value{font-family:var(--font-mono);font-weight:600}
+.metric-row .tag{
+  display:inline-block;padding:1px 6px;border-radius:3px;font-size:.65rem;
+  font-family:var(--font-mono);margin-left:4px;
+}
+.tag.above{background:rgba(0,204,102,.15);color:var(--green)}
+.tag.below{background:rgba(238,51,68,.15);color:var(--red)}
+.tag.neutral{background:rgba(136,136,170,.15);color:var(--text-dim)}
+
+/* ── Leader Grid ────────────────────────────────────────────── */
+.leader-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px}
+.leader-chip{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:8px;text-align:center;font-family:var(--font-mono);font-size:.72rem;
+  transition:border-color .3s;
+}
+.leader-chip.bullish{border-color:rgba(0,204,102,.4)}
+.leader-chip.bearish{border-color:rgba(238,51,68,.4)}
+.leader-chip .lsym{font-weight:700;color:var(--neon-cyan);font-size:.8rem}
+.leader-chip .lpx{margin:2px 0}
+.leader-chip .ltags{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+
+/* ── Sector Bars ────────────────────────────────────────────── */
+.sector-row{
+  display:flex;align-items:center;gap:8px;padding:3px 0;font-size:.72rem;
+}
+.sector-row .sname{width:80px;color:var(--text-dim);text-align:right;flex-shrink:0}
+.sector-bar-wrap{flex:1;height:14px;background:var(--bg4);border-radius:3px;overflow:hidden;position:relative}
+.sector-bar{height:100%;border-radius:3px;transition:width .8s ease;min-width:2px}
+.sector-bar.pos{background:linear-gradient(90deg,rgba(0,204,102,.6),var(--green))}
+.sector-bar.neg{background:linear-gradient(90deg,var(--red),rgba(238,51,68,.6))}
+.sector-row .sval{width:55px;font-family:var(--font-mono);font-weight:600;text-align:right;flex-shrink:0}
+.sector-row .stag{width:18px;text-align:center;flex-shrink:0}
+
+/* ── VIX Gauge ──────────────────────────────────────────────── */
+.vix-gauge{
+  display:flex;align-items:center;gap:16px;margin-bottom:12px;
+}
+.vix-level{
+  font-family:var(--font-mono);font-size:2rem;font-weight:700;
+}
+.vix-zone-badge{
+  padding:4px 12px;border-radius:6px;font-size:.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:1px;
+}
+.zone-complacent{background:rgba(0,204,102,.2);color:var(--green)}
+.zone-normal{background:rgba(238,187,0,.2);color:var(--yellow)}
+.zone-elevated{background:rgba(255,136,0,.2);color:var(--neon-orange)}
+.zone-fear{background:rgba(255,51,85,.2);color:var(--red)}
+
+/* ── Macro Notes ────────────────────────────────────────────── */
+.macro-note{
+  background:var(--bg3);border-left:3px solid var(--neon-purple);
+  padding:6px 10px;margin:4px 0;font-size:.78rem;border-radius:0 4px 4px 0;
+}
+.macro-events{margin-top:10px}
+.event-row{
+  display:flex;gap:10px;align-items:center;padding:4px 0;font-size:.75rem;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.event-date{color:var(--neon-cyan);font-family:var(--font-mono);min-width:70px}
+.event-name{flex:1}
+.event-impact{
+  padding:1px 6px;border-radius:3px;font-size:.6rem;font-weight:700;
+  text-transform:uppercase;font-family:var(--font-mono);
+}
+.impact-high{background:rgba(255,51,85,.2);color:var(--red)}
+.impact-medium{background:rgba(238,187,0,.2);color:var(--yellow)}
+
+/* ── Position Sizing Calculator ─────────────────────────────── */
+.calc-section{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:20px;margin-bottom:20px;
+}
+.calc-section h2{
+  font-size:1rem;color:var(--neon-pink);margin-bottom:16px;
+  font-family:var(--font-mono);letter-spacing:1px;
+}
+.calc-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.calc-input{flex:1;min-width:260px}
+.calc-output{flex:1;min-width:260px}
+.slider-wrap{margin-bottom:16px}
+.slider-wrap label{display:block;color:var(--text-dim);font-size:.8rem;margin-bottom:8px}
+.slider-val{
+  font-family:var(--font-mono);font-size:2rem;font-weight:700;
+  color:var(--neon-cyan);text-align:center;margin:8px 0;
+}
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:6px;border-radius:3px;
+  background:var(--bg4);outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--neon-cyan);cursor:pointer;
+  box-shadow:0 0 10px rgba(0,240,255,.5);
+}
+.result-card{
+  background:var(--bg3);border-radius:8px;padding:16px;text-align:center;
+}
+.result-eff{
+  font-family:var(--font-mono);font-size:2.4rem;font-weight:700;
+  margin:8px 0;
+}
+.result-risk{
+  font-family:var(--font-mono);font-size:1.4rem;font-weight:700;
+  margin:4px 0;
+}
+.result-desc{font-size:.8rem;color:var(--text-dim);margin-top:8px}
+
+/* sizing table */
+.sizing-table{
+  width:100%;border-collapse:collapse;margin-top:12px;font-size:.72rem;
+  font-family:var(--font-mono);
+}
+.sizing-table th{
+  text-align:left;padding:4px 8px;color:var(--text-muted);border-bottom:1px solid var(--border);
+}
+.sizing-table td{padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+.sizing-table tr.active{background:rgba(0,240,255,.08)}
+.sizing-table .no-trade{color:var(--text-muted)}
+
+/* ── Editable textarea for macro ────────────────────────────── */
+.macro-textarea{
+  width:100%;min-height:80px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;color:var(--text);font-size:.78rem;padding:8px;
+  font-family:var(--font-mono);resize:vertical;
+}
+.macro-textarea:focus{outline:none;border-color:var(--neon-purple)}
+.macro-score-input{
+  display:flex;align-items:center;gap:8px;margin-top:8px;
+}
+.macro-score-input label{font-size:.75rem;color:var(--text-dim)}
+.macro-score-input input[type=range]{width:150px}
+.macro-score-input .msval{font-family:var(--font-mono);color:var(--neon-purple);font-weight:700}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.footer{
+  text-align:center;padding:16px;color:var(--text-muted);font-size:.7rem;
+  border-top:1px solid var(--border);margin-top:16px;
+}
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.dim-card{animation:fadeIn .5s ease both}
+.dim-card:nth-child(2){animation-delay:.05s}
+.dim-card:nth-child(3){animation-delay:.1s}
+.dim-card:nth-child(4){animation-delay:.15s}
+.dim-card:nth-child(5){animation-delay:.2s}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.live-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--neon-green);margin-right:6px;animation:pulse 2s infinite;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media(max-width:800px){
+  .dim-grid{grid-template-columns:1fr}
+  .leader-grid{grid-template-columns:repeat(2,1fr)}
+  .gauge-wrap{width:140px;height:140px}
+  .gauge-text{font-size:2rem}
+  .score-value{font-size:3rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🐭 大鼠市场风控仪表盘</h1>
+    <div class="subtitle">Based on @investingluc's 5-Dimension Framework — Conviction × Environment = Size</div>
+    <div class="timestamp" id="ts"><span class="live-dot"></span>Loading...</div>
+  </div>
+
+  <!-- Overall Score -->
+  <div class="score-banner">
+    <div class="score-label">综合环境评分 Overall Environment Score</div>
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 200 200" width="180" height="180">
+        <circle class="gauge-bg" cx="100" cy="100" r="85"/>
+        <circle class="gauge-fill" id="gauge-circle" cx="100" cy="100" r="85"
+          stroke-dasharray="534" stroke-dashoffset="534"/>
+      </svg>
+      <div class="gauge-text" id="overall-score">—</div>
+    </div>
+    <div class="score-recommendation" id="overall-rec">Loading data...</div>
+  </div>
+
+  <!-- Price Ticker -->
+  <div class="ticker-strip" id="ticker-strip"></div>
+
+  <!-- Dimension Grid -->
+  <div class="dim-grid" id="dim-grid">
+    <!-- Cards injected by JS -->
+  </div>
+
+  <!-- Position Sizing Calculator -->
+  <div class="calc-section">
+    <h2>📏 仓位计算器 Position Sizing Calculator</h2>
+    <div class="calc-row">
+      <div class="calc-input">
+        <div class="slider-wrap">
+          <label>论点确信度 Thesis Conviction (1–10)</label>
+          <div class="slider-val" id="conv-val">7</div>
+          <input type="range" id="conviction" min="1" max="10" value="7" step="1">
+        </div>
+        <table class="sizing-table" id="sizing-table">
+          <thead><tr><th>C</th><th>风险 Risk %</th><th>说明</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="calc-output">
+        <div class="result-card">
+          <div style="color:var(--text-dim);font-size:.8rem">有效确信度 Effective Conviction</div>
+          <div class="result-eff" id="eff-conv">—</div>
+          <div style="color:var(--text-dim);font-size:.8rem;margin-top:8px">建议风险 Recommended Risk</div>
+          <div class="result-risk" id="eff-risk">—</div>
+          <div class="result-desc" id="eff-desc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    🐭 大鼠风控仪表盘 v1.0 · Data refreshes every 5min ·
+    <button id="btn-refresh" onclick="manualRefresh()" style="
+      background:var(--bg3);border:1px solid var(--neon-cyan);color:var(--neon-cyan);
+      padding:4px 16px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);
+      font-size:0.85rem;margin-left:8px;transition:all .2s;
+    " onmouseover="this.style.background='var(--neon-cyan)';this.style.color='var(--bg)'"
+       onmouseout="this.style.background='var(--bg3)';this.style.color='var(--neon-cyan)'">
+      ⟳ 刷新数据 Refresh
+    </button>
+    <span id="refresh-status" style="color:var(--text-dim);margin-left:8px;font-size:0.8rem;"></span>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD JS — Pure Vanilla
+   ═══════════════════════════════════════════════════════════════ */
+
+const DATA_PATH = './market-dashboard.json';
+const REFRESH_MS = 5 * 60 * 1000;
+
+const SIZING_MAP = {
+  1:{risk:'No trade',pct:0,desc:'不交易'},
+  2:{risk:'No trade',pct:0,desc:'不交易'},
+  3:{risk:'No trade',pct:0,desc:'不交易'},
+  4:{risk:'No trade',pct:0,desc:'不交易'},
+  5:{risk:'0.9%',pct:0.9,desc:'最小仓位 Minimum'},
+  6:{risk:'1.5%',pct:1.5,desc:'轻仓 Light'},
+  7:{risk:'3%',pct:3,desc:'标准仓位 Standard (周上限)'},
+  8:{risk:'5%',pct:5,desc:'重仓 Heavy'},
+  9:{risk:'10%',pct:10,desc:'高确信 High conviction'},
+  10:{risk:'25%',pct:25,desc:'全押 Max conviction'},
+};
+
+let DATA = null;
+let macroScoreOverride = null;
+
+// ── Helpers ──────────────────────────────────────────────────
+function scoreColor(s){
+  if(s>=0.7) return 'green';
+  if(s>=0.4) return 'yellow';
+  if(s>=0.2) return 'orange';
+  return 'red';
+}
+function scoreCSSColor(s){
+  if(s>=0.7) return 'var(--neon-green)';
+  if(s>=0.4) return 'var(--neon-yellow)';
+  if(s>=0.2) return 'var(--neon-orange)';
+  return 'var(--neon-red)';
+}
+function fmtPct(v,sign=true){
+  if(v==null) return '—';
+  const s = sign && v>0 ? '+' : '';
+  return s + v.toFixed(2) + '%';
+}
+function fmtPrice(v,digits=2){
+  if(v==null) return '—';
+  if(v>999) return '$'+v.toLocaleString('en',{maximumFractionDigits:0});
+  return '$'+v.toFixed(digits);
+}
+function trendTag(status){
+  if(status==='above') return '<span class="tag above">▲ Above</span>';
+  if(status==='below') return '<span class="tag below">▼ Below</span>';
+  return '<span class="tag neutral">—</span>';
+}
+function chgClass(v){return v==null?'':v>=0?'up':'down'}
+
+// ── Gauge ────────────────────────────────────────────────────
+function setGauge(pct){
+  const circ = document.getElementById('gauge-circle');
+  const total = 2*Math.PI*85; // ~534
+  const offset = total * (1 - pct);
+  circ.style.strokeDashoffset = offset;
+  circ.style.stroke = scoreCSSColor(pct);
+  const el = document.getElementById('overall-score');
+  el.textContent = Math.round(pct*100)+'%';
+  el.style.color = scoreCSSColor(pct);
+}
+
+// ── Ticker ───────────────────────────────────────────────────
+function renderTicker(data){
+  const strip = document.getElementById('ticker-strip');
+  const prices = data.prices || {};
+  // also pull 1w changes from dim1
+  const env = data.dim1_environment?.assets || {};
+  const items = [
+    {sym:'SPY',px:prices.SPY,chg:env.SPY?.chg_1w},
+    {sym:'QQQ',px:prices.QQQ,chg:env.QQQ?.chg_1w},
+    {sym:'BTC',px:prices.BTC,chg:env.BTC?.chg_1w},
+    {sym:'VIX',px:prices.VIX,chg:data.dim3_vix?.vix?.chg_1w},
+    {sym:'WTI',px:prices.WTI,chg:env.WTI?.chg_1w},
+    {sym:'TNX',px:prices.TNX,chg:env.TNX?.chg_1w},
+    {sym:'DXY',px:prices.DXY,chg:env.DXY?.chg_1w},
+    {sym:'GLD',px:prices.GLD,chg:env.GLD?.chg_1w},
+  ];
+  strip.innerHTML = items.map(i=>`
+    <div class="ticker-item">
+      <div class="sym">${i.sym}</div>
+      <div class="px">${i.sym==='BTC'? (i.px?'$'+(i.px/1000).toFixed(1)+'K':'—') : (i.sym==='TNX'? (i.px!=null?i.px.toFixed(2)+'%':'—') : fmtPrice(i.px))}</div>
+      <div class="chg ${chgClass(i.chg)}">${fmtPct(i.chg)} 1W</div>
+    </div>
+  `).join('');
+}
+
+// ── Dimension 1: Environment ─────────────────────────────────
+function renderDim1(dim){
+  const a = dim.assets||{};
+  const rows = [];
+  for(const key of ['SPY','QQQ']){
+    const d=a[key];if(!d) continue;
+    rows.push(`<div class="metric-row"><span class="label">${key}</span><span class="value">${fmtPrice(d.price)} ${trendTag(d.trend_50)}<small style="color:var(--text-muted)">50SMA</small> ${trendTag(d.trend_200)}<small style="color:var(--text-muted)">200SMA</small></span></div>`);
+    rows.push(`<div class="metric-row"><span class="label" style="padding-left:12px">变化 Change</span><span class="value"><span class="chg ${chgClass(d.chg_1w)}">${fmtPct(d.chg_1w)} 1W</span> · <span class="chg ${chgClass(d.chg_1m)}">${fmtPct(d.chg_1m)} 1M</span> · <span class="chg ${chgClass(d.chg_3m)}">${fmtPct(d.chg_3m)} 3M</span></span></div>`);
+  }
+  // Relative strength
+  rows.push(`<div class="metric-row"><span class="label">相对强弱 RS</span><span class="value">${dim.relative_strength||'—'} 领先 (${fmtPct(dim.relative_spread)})</span></div>`);
+  // BTC
+  const btc=a.BTC;
+  if(btc) rows.push(`<div class="metric-row"><span class="label">BTC 风险偏好</span><span class="value">${fmtPrice(btc.price)} <span class="chg ${chgClass(btc.chg_1m)}">${fmtPct(btc.chg_1m)} 1M</span></span></div>`);
+  // Oil
+  const wti=a.WTI;
+  if(wti) rows.push(`<div class="metric-row"><span class="label">WTI 原油</span><span class="value">${fmtPrice(wti.price)} <span class="chg ${chgClass(wti.chg_1w)}">${fmtPct(wti.chg_1w)} 1W</span></span></div>`);
+  // TNX
+  const tnx=a.TNX;
+  if(tnx) rows.push(`<div class="metric-row"><span class="label">10Y 收益率</span><span class="value">${tnx.price!=null?tnx.price.toFixed(2)+'%':'—'} <span class="chg ${chgClass(tnx.chg_1w)}">${fmtPct(tnx.chg_1w)} 1W</span></span></div>`);
+  // DXY
+  const dxy=a.DXY;
+  if(dxy) rows.push(`<div class="metric-row"><span class="label">DXY 美元指数</span><span class="value">${dxy.price!=null?dxy.price.toFixed(2):'—'} <span class="chg ${chgClass(dxy.chg_1w)}">${fmtPct(dxy.chg_1w)} 1W</span></span></div>`);
+  // Gold
+  const gld=a.GLD;
+  if(gld) rows.push(`<div class="metric-row"><span class="label">GLD 黄金 避险</span><span class="value">${fmtPrice(gld.price)} <span class="chg ${chgClass(gld.chg_1m)}">${fmtPct(gld.chg_1m)} 1M</span></span></div>`);
+  // Cu/Au
+  if(dim.copper_gold_ratio!=null) rows.push(`<div class="metric-row"><span class="label">铜金比 Cu/Au</span><span class="value">${dim.copper_gold_ratio.toFixed(4)}</span></div>`);
+
+  return rows.join('');
+}
+
+// ── Dimension 2: Leaders ─────────────────────────────────────
+function renderDim2(dim){
+  const leaders = dim.leaders||{};
+  let html=`<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:6px">Above 50SMA: ${dim.above_50sma_count}/${dim.total}</div>`;
+  html+='<div class="leader-grid">';
+  for(const [sym,m] of Object.entries(leaders)){
+    const bullish = m.trend_50==='above' && (m.chg_1m==null||m.chg_1m>0);
+    html+=`<div class="leader-chip ${bullish?'bullish':'bearish'}">
+      <div class="lsym">${sym}</div>
+      <div class="lpx">${fmtPrice(m.price)}</div>
+      <div class="ltags">
+        ${trendTag(m.trend_50)}
+        <span class="tag ${m.rsi14!=null&&m.rsi14>60?'above':m.rsi14!=null&&m.rsi14<40?'below':'neutral'}">RSI ${m.rsi14!=null?m.rsi14:'—'}</span>
+      </div>
+      <div style="margin-top:3px"><span class="chg ${chgClass(m.chg_1w)}">${fmtPct(m.chg_1w)} 1W</span> <span class="chg ${chgClass(m.chg_1m)}">${fmtPct(m.chg_1m)} 1M</span></div>
+    </div>`;
+  }
+  html+='</div>';
+  return html;
+}
+
+// ── Dimension 3: VIX ─────────────────────────────────────────
+function renderDim3(dim){
+  const v=dim.vix||{};
+  const zone=dim.zone||'unknown';
+  const zoneLabel={'complacent':'😌 自满 Complacent','normal':'😐 正常 Normal','elevated':'😰 升高 Elevated','fear':'😱 恐慌 Fear'}[zone]||zone;
+  let html=`<div class="vix-gauge">
+    <div class="vix-level" style="color:${{'complacent':'var(--green)','normal':'var(--yellow)','elevated':'var(--neon-orange)','fear':'var(--red)'}[zone]||'var(--text)'}">${v.price!=null?v.price.toFixed(1):'—'}</div>
+    <div class="vix-zone-badge zone-${zone}">${zoneLabel}</div>
+  </div>`;
+  html+=`<div class="metric-row"><span class="label">VIX 变化</span><span class="value"><span class="chg ${chgClass(v.chg_1w)}">${fmtPct(v.chg_1w)} 1W</span> · <span class="chg ${chgClass(v.chg_1m)}">${fmtPct(v.chg_1m)} 1M</span></span></div>`;
+  html+=`<div class="metric-row"><span class="label">VIX vs 50SMA</span><span class="value">${trendTag(v.trend_50)}</span></div>`;
+  const v3m=dim.vix3m||{};
+  html+=`<div class="metric-row"><span class="label">VIX3M</span><span class="value">${v3m.price!=null?v3m.price.toFixed(1):'—'}</span></div>`;
+  html+=`<div class="metric-row"><span class="label">期限结构 Term</span><span class="value">${dim.term_ratio!=null?dim.term_ratio.toFixed(3):''} <span class="tag ${dim.term_structure==='contango'?'above':'below'}">${dim.term_structure||'—'}</span></span></div>`;
+  html+=`<div class="metric-row"><span class="label">波动聚集 Vol Cluster</span><span class="value">${dim.vol_cluster_count!=null?dim.vol_cluster_count+' days (>2% SPY)':'—'}</span></div>`;
+  return html;
+}
+
+// ── Dimension 4: Breadth ─────────────────────────────────────
+function renderDim4(dim){
+  const sectors=dim.sectors||{};
+  let html=`<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:6px">Above 50SMA: ${dim.above_50sma||0}/${dim.total||0} · Positive 1M: ${dim.positive_1m||0}/${dim.total||0}</div>`;
+  if(dim.best) html+=`<div style="font-size:.72rem;margin-bottom:8px">🏆 最强: <span style="color:var(--green)">${dim.best}</span> · 🔻 最弱: <span style="color:var(--red)">${dim.worst}</span></div>`;
+
+  // Find max abs change for scaling
+  let maxAbs=1;
+  for(const m of Object.values(sectors)){if(m.chg_1m!=null) maxAbs=Math.max(maxAbs,Math.abs(m.chg_1m))}
+
+  for(const [sym,m] of Object.entries(sectors)){
+    const chg=m.chg_1m||0;
+    const w = Math.abs(chg)/maxAbs*100;
+    const pos = chg>=0;
+    html+=`<div class="sector-row">
+      <span class="sname">${sym}</span>
+      <span class="stag">${m.trend_50==='above'?'✅':'❌'}</span>
+      <div class="sector-bar-wrap"><div class="sector-bar ${pos?'pos':'neg'}" style="width:${Math.max(w,2)}%"></div></div>
+      <span class="sval chg ${chgClass(chg)}">${fmtPct(chg)}</span>
+    </div>`;
+  }
+  return html;
+}
+
+// ── Dimension 5: Macro ───────────────────────────────────────
+function renderDim5(dim){
+  const notes=dim.notes||[];
+  let html='';
+  for(const n of notes) html+=`<div class="macro-note">• ${n}</div>`;
+
+  // Events
+  const events=dim.events||[];
+  if(events.length){
+    html+='<div class="macro-events"><div style="font-size:.75rem;color:var(--text-dim);margin-bottom:4px">📅 关键事件 Key Events</div>';
+    for(const e of events){
+      html+=`<div class="event-row"><span class="event-date">${e.date}</span><span class="event-name">${e.event}</span><span class="event-impact impact-${e.impact}">${e.impact}</span></div>`;
+    }
+    html+='</div>';
+  }
+
+  // Editable notes
+  html+=`<div style="margin-top:12px"><div style="font-size:.75rem;color:var(--text-dim);margin-bottom:4px">✏️ 备注 Notes (local only)</div>
+    <textarea class="macro-textarea" id="macro-notes" placeholder="在此添加宏观判断...">${localStorage.getItem('macro_notes')||''}</textarea></div>`;
+
+  // Macro score override slider
+  const curScore = macroScoreOverride!=null ? macroScoreOverride : dim.score;
+  html+=`<div class="macro-score-input">
+    <label>宏观评分覆盖 Macro Score Override:</label>
+    <input type="range" id="macro-slider" min="0" max="100" value="${Math.round(curScore*100)}" step="5">
+    <span class="msval" id="macro-sval">${Math.round(curScore*100)}%</span>
+  </div>`;
+
+  return html;
+}
+
+// ── Build Dimension Cards ────────────────────────────────────
+function renderDimensions(data){
+  const grid=document.getElementById('dim-grid');
+  const dims=[
+    {key:'dim1_environment',dimKey:'1_environment',icon:'📍',title:'维度1: 当前环境 Current Environment',render:renderDim1},
+    {key:'dim2_leaders',dimKey:'2_leaders',icon:'💪',title:'维度2: 龙头相对强度 Leader Strength',render:renderDim2},
+    {key:'dim3_vix',dimKey:'3_vix',icon:'😱',title:'维度3: VIX 行为 VIX Behavior',render:renderDim3},
+    {key:'dim4_breadth',dimKey:'4_breadth',icon:'📊',title:'维度4: 广度/参与度 Breadth',render:renderDim4},
+    {key:'dim5_macro',dimKey:'5_macro',icon:'🌍',title:'维度5: 宏观背景 Macro Backdrop',render:renderDim5},
+  ];
+
+  grid.innerHTML = dims.map(d=>{
+    const dimData = data[d.key]||{};
+    const score = data.dimensions?.[d.dimKey]??0;
+    const col = scoreColor(score);
+    const content = d.render(dimData);
+    return `<div class="dim-card">
+      <div class="dim-header">
+        <span class="dim-title">${d.icon} ${d.title}</span>
+        <span class="dim-score-badge" style="color:${scoreCSSColor(score)};background:${scoreCSSColor(score)}22">${Math.round(score*100)}%</span>
+      </div>
+      <div class="dim-score-bar"><div class="fill" style="width:${score*100}%;background:${scoreCSSColor(score)}"></div></div>
+      ${content}
+    </div>`;
+  }).join('');
+
+  // Bind events
+  const macroSlider=document.getElementById('macro-slider');
+  if(macroSlider){
+    macroSlider.addEventListener('input',function(){
+      macroScoreOverride = this.value/100;
+      document.getElementById('macro-sval').textContent=this.value+'%';
+      recalcOverall();
+      updateCalc();
+    });
+  }
+  const macroTA=document.getElementById('macro-notes');
+  if(macroTA){
+    macroTA.addEventListener('input',function(){
+      localStorage.setItem('macro_notes',this.value);
+    });
+  }
+}
+
+// ── Overall Score ────────────────────────────────────────────
+function getOverall(){
+  if(!DATA) return 0;
+  const dims=DATA.dimensions||{};
+  const w=DATA.weights||{'1_environment':0.25,'2_leaders':0.2,'3_vix':0.2,'4_breadth':0.2,'5_macro':0.15};
+  let total=0;
+  for(const [k,wt] of Object.entries(w)){
+    let s = dims[k]||0;
+    if(k==='5_macro' && macroScoreOverride!=null) s=macroScoreOverride;
+    total+=s*wt;
+  }
+  return total;
+}
+
+function recalcOverall(){
+  const overall=getOverall();
+  setGauge(overall);
+  const rec=document.getElementById('overall-rec');
+  if(overall>=0.7){
+    rec.textContent='🟢 环境强势 — 正常仓位交易';
+    rec.style.background='rgba(0,204,102,.15)';rec.style.color='var(--green)';
+  }else if(overall>=0.5){
+    rec.textContent='🟡 环境中性 — 减仓操作';
+    rec.style.background='rgba(238,187,0,.15)';rec.style.color='var(--yellow)';
+  }else if(overall>=0.3){
+    rec.textContent='🟠 环境偏弱 — 仅最小仓位';
+    rec.style.background='rgba(255,136,0,.15)';rec.style.color='var(--neon-orange)';
+  }else{
+    rec.textContent='🔴 环境恶劣 — 观望或对冲';
+    rec.style.background='rgba(255,51,85,.15)';rec.style.color='var(--red)';
+  }
+}
+
+// ── Position Sizing Calculator ───────────────────────────────
+function updateCalc(){
+  const conv = parseInt(document.getElementById('conviction').value);
+  document.getElementById('conv-val').textContent=conv;
+
+  const overall=getOverall();
+  const eff = Math.max(1,Math.min(10,Math.round(conv*overall)));
+
+  const effEl=document.getElementById('eff-conv');
+  effEl.textContent='C'+eff;
+  effEl.style.color=scoreCSSColor(eff/10);
+
+  const sizing=SIZING_MAP[eff];
+  const riskEl=document.getElementById('eff-risk');
+  riskEl.textContent=sizing.risk;
+  riskEl.style.color=sizing.pct===0?'var(--text-muted)':scoreCSSColor(eff/10);
+
+  document.getElementById('eff-desc').textContent=
+    `${sizing.desc} · 论点C${conv} × 环境${Math.round(overall*100)}% = 有效C${eff}`;
+
+  // Update table highlights
+  document.querySelectorAll('#sizing-table tbody tr').forEach(tr=>{
+    tr.classList.toggle('active',parseInt(tr.dataset.c)===eff);
+  });
+}
+
+function buildSizingTable(){
+  const tbody=document.querySelector('#sizing-table tbody');
+  tbody.innerHTML='';
+  for(const [c,s] of Object.entries(SIZING_MAP)){
+    const tr=document.createElement('tr');
+    tr.dataset.c=c;
+    tr.innerHTML=`<td${s.pct===0?' class="no-trade"':''}>C${c}</td><td${s.pct===0?' class="no-trade"':''}>${s.risk}</td><td style="color:var(--text-dim)">${s.desc}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+// ── Data Load ────────────────────────────────────────────────
+async function loadData(){
+  try{
+    const resp=await fetch(DATA_PATH+'?t='+Date.now());
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    DATA=await resp.json();
+  }catch(e){
+    console.warn('Failed to fetch live data, using embedded sample',e);
+    // If fetch fails (e.g. file:// protocol), use embedded sample
+    if(!DATA) DATA = SAMPLE_DATA;
+  }
+  render();
+}
+
+function render(){
+  if(!DATA) return;
+  // Timestamp
+  const ts=DATA.timestamp;
+  document.getElementById('ts').innerHTML=`<span class="live-dot"></span>${ts?new Date(ts).toLocaleString('zh-CN',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—'} ET`;
+
+  renderTicker(DATA);
+  renderDimensions(DATA);
+  recalcOverall();
+  updateCalc();
+}
+
+// ── Embedded Sample Data (fallback for file:// mode) ────────
+const SAMPLE_DATA = {
+  "timestamp":"2026-03-28T15:00:00",
+  "overall":0.131,
+  "dimensions":{"1_environment":0.067,"2_leaders":0.025,"3_vix":0.222,"4_breadth":0.136,"5_macro":0.25},
+  "weights":{"1_environment":0.25,"2_leaders":0.2,"3_vix":0.2,"4_breadth":0.2,"5_macro":0.15},
+  "dim1_environment":{
+    "score":0.067,
+    "assets":{
+      "SPY":{"price":634.09,"sma50":580,"sma200":560,"trend_50":"above","trend_200":"above","chg_1w":-2.5,"chg_1m":-8.1,"chg_3m":-5.2},
+      "QQQ":{"price":562.58,"sma50":520,"sma200":500,"trend_50":"above","trend_200":"above","chg_1w":-3.1,"chg_1m":-10.2,"chg_3m":-7.8},
+      "BTC":{"price":66750,"sma50":70000,"sma200":65000,"trend_50":"below","trend_200":"above","chg_1w":-4.2,"chg_1m":-12.5,"chg_3m":-8.0},
+      "WTI":{"price":99.64,"sma50":85,"sma200":80,"trend_50":"above","trend_200":"above","chg_1w":5.2,"chg_1m":12.3,"chg_3m":18.5},
+      "TNX":{"price":4.44,"sma50":4.3,"sma200":4.2,"trend_50":"above","trend_200":"above","chg_1w":2.1,"chg_1m":5.0,"chg_3m":3.2},
+      "DXY":{"price":104.2,"sma50":103,"sma200":102,"trend_50":"above","trend_200":"above","chg_1w":0.8,"chg_1m":1.5,"chg_3m":2.0},
+      "GLD":{"price":285,"sma50":270,"sma200":260,"trend_50":"above","trend_200":"above","chg_1w":1.5,"chg_1m":4.2,"chg_3m":8.0},
+      "CPER":{"price":28,"sma50":27,"sma200":26,"trend_50":"above","trend_200":"above","chg_1w":-0.5,"chg_1m":-2.0,"chg_3m":-1.0}
+    },
+    "copper_gold_ratio":0.0982,"relative_strength":"SPY","relative_spread":-2.1
+  },
+  "dim2_leaders":{
+    "score":0.025,"above_50sma_count":1,"total":10,
+    "leaders":{
+      "NVDA":{"price":110,"sma50":120,"trend_50":"below","rsi14":35,"chg_1w":-5,"chg_1m":-15,"chg_3m":-20},
+      "META":{"price":580,"sma50":600,"trend_50":"below","rsi14":38,"chg_1w":-3,"chg_1m":-10,"chg_3m":-8},
+      "AAPL":{"price":218,"sma50":230,"trend_50":"below","rsi14":40,"chg_1w":-2,"chg_1m":-8,"chg_3m":-5},
+      "MSFT":{"price":410,"sma50":420,"trend_50":"below","rsi14":42,"chg_1w":-1.5,"chg_1m":-6,"chg_3m":-4},
+      "AVGO":{"price":185,"sma50":200,"trend_50":"below","rsi14":33,"chg_1w":-6,"chg_1m":-18,"chg_3m":-22},
+      "GOOGL":{"price":170,"sma50":180,"trend_50":"below","rsi14":37,"chg_1w":-4,"chg_1m":-12,"chg_3m":-10},
+      "AMZN":{"price":195,"sma50":210,"trend_50":"below","rsi14":36,"chg_1w":-3.5,"chg_1m":-11,"chg_3m":-9},
+      "TSLA":{"price":260,"sma50":280,"trend_50":"below","rsi14":30,"chg_1w":-8,"chg_1m":-20,"chg_3m":-25},
+      "AMD":{"price":105,"sma50":115,"trend_50":"below","rsi14":32,"chg_1w":-5.5,"chg_1m":-16,"chg_3m":-18},
+      "CRM":{"price":280,"sma50":290,"trend_50":"below","rsi14":39,"chg_1w":-2.5,"chg_1m":-7,"chg_3m":-6}
+    }
+  },
+  "dim3_vix":{
+    "score":0.222,
+    "vix":{"price":31.05,"sma50":22,"trend_50":"above","chg_1w":15,"chg_1m":40,"chg_3m":55},
+    "vix3m":{"price":28,"sma50":24,"trend_50":"above","chg_1w":8,"chg_1m":20},
+    "zone":"fear","term_ratio":1.109,"term_structure":"backwardation","vol_cluster_count":3
+  },
+  "dim4_breadth":{
+    "score":0.136,"above_50sma":3,"positive_1m":0,"total":11,"best":"XLE","worst":"XLK",
+    "sectors":{
+      "XLK":{"price":200,"sma50":220,"trend_50":"below","chg_1m":-12,"name":"科技 Technology"},
+      "XLF":{"price":44,"sma50":43,"trend_50":"above","chg_1m":-3,"name":"金融 Financials"},
+      "XLE":{"price":92,"sma50":88,"trend_50":"above","chg_1m":-1,"name":"能源 Energy"},
+      "XLV":{"price":148,"sma50":150,"trend_50":"below","chg_1m":-4,"name":"医疗 Healthcare"},
+      "XLI":{"price":125,"sma50":128,"trend_50":"below","chg_1m":-5,"name":"工业 Industrials"},
+      "XLP":{"price":80,"sma50":79,"trend_50":"above","chg_1m":-2,"name":"必需消费 Staples"},
+      "XLU":{"price":72,"sma50":73,"trend_50":"below","chg_1m":-3,"name":"公用事业 Utilities"},
+      "XLY":{"price":188,"sma50":200,"trend_50":"below","chg_1m":-10,"name":"可选消费 Discretionary"},
+      "XLB":{"price":85,"sma50":87,"trend_50":"below","chg_1m":-5,"name":"材料 Materials"},
+      "XLRE":{"price":40,"sma50":42,"trend_50":"below","chg_1m":-6,"name":"房地产 Real Estate"},
+      "XLC":{"price":90,"sma50":95,"trend_50":"below","chg_1m":-8,"name":"通信 Comm Services"}
+    }
+  },
+  "dim5_macro":{
+    "score":0.25,
+    "notes":["Tariff escalation risk — broad trade war uncertainty","Fed policy path unclear — rate cuts delayed","Geopolitical: Middle East, China-Taiwan tensions","Liquidity cycle — mixed signals","Upcoming: FOMC, CPI, NFP — check calendar"],
+    "events":[{"date":"TBD","event":"FOMC Meeting","impact":"high"},{"date":"TBD","event":"CPI Release","impact":"high"},{"date":"TBD","event":"NFP / Jobs Report","impact":"medium"}]
+  },
+  "prices":{"SPY":634.09,"QQQ":562.58,"BTC":66750,"VIX":31.05,"VIX3M":28,"WTI":99.64,"TNX":4.44,"DXY":104.2,"GLD":285,"CPER":28}
+};
+
+// ── Init ─────────────────────────────────────────────────────
+buildSizingTable();
+document.getElementById('conviction').addEventListener('input',updateCalc);
+
+// Try loading live data first, fall back to sample
+loadData();
+
+// Auto-refresh
+setInterval(loadData, REFRESH_MS);
+
+// Manual refresh button
+function manualRefresh() {
+  const btn = document.getElementById('btn-refresh');
+  const status = document.getElementById('refresh-status');
+  btn.disabled = true;
+  btn.textContent = '⏳ 刷新中...';
+  status.textContent = '';
+  
+  loadData();
+  
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = '⟳ 刷新数据 Refresh';
+    const now = new Date();
+    status.textContent = `Last refresh: ${now.toLocaleTimeString()}`;
+  }, 1500);
+}
+</script>
+</body>
+</html>
