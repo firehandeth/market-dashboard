@@ -400,7 +400,9 @@ input[type=range]::-webkit-slider-thumb{
       </div>
       <div class="calc-output">
         <div class="result-card">
-          <div style="color:var(--text-dim);font-size:.8rem">有效确信度 Effective Conviction</div>
+          <div style="color:var(--text-dim);font-size:.8rem">方向 Direction</div>
+          <div class="result-eff" id="eff-direction" style="font-size:1.4rem">—</div>
+          <div style="color:var(--text-dim);font-size:.8rem;margin-top:8px">有效确信度 Effective Conviction</div>
           <div class="result-eff" id="eff-conv">—</div>
           <div style="color:var(--text-dim);font-size:.8rem;margin-top:8px">建议风险 Recommended Risk</div>
           <div class="result-risk" id="eff-risk">—</div>
@@ -411,7 +413,7 @@ input[type=range]::-webkit-slider-thumb{
   </div>
 
   <div class="footer">
-    🐭 大鼠风控仪表盘 v2.0 · Data refreshes every 5min ·
+    🐭 大鼠风控仪表盘 v2.2 · Bidirectional · Data refreshes every 5min ·
     <button id="btn-refresh" onclick="manualRefresh()" style="
       background:var(--bg3);border:1px solid var(--neon-cyan);color:var(--neon-cyan);
       padding:4px 16px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);
@@ -500,12 +502,21 @@ function trendTagWithDist(status, distVal) {
 function setGauge(pct){
   const circ = document.getElementById('gauge-circle');
   const total = 2*Math.PI*85; // ~534
-  const offset = total * (1 - pct);
+  // For gauge fill: high = more filled (long), low = also more filled (short)
+  // Map: distance from 50% center → fill amount
+  const strength = pct >= 0.4 ? pct : (1 - pct);
+  const offset = total * (1 - strength);
   circ.style.strokeDashoffset = offset;
-  circ.style.stroke = scoreCSSColor(pct);
+  // Color: green for long, red for short, grey for neutral
+  let gaugeColor;
+  if(pct >= 0.5) gaugeColor = 'var(--green)';
+  else if(pct >= 0.4) gaugeColor = 'var(--text-muted)';
+  else if(pct >= 0.2) gaugeColor = 'var(--neon-orange)';
+  else gaugeColor = 'var(--red)';
+  circ.style.stroke = gaugeColor;
   const el = document.getElementById('overall-score');
   el.textContent = Math.round(pct*100)+'%';
-  el.style.color = scoreCSSColor(pct);
+  el.style.color = gaugeColor;
 }
 
 // ── Ticker ───────────────────────────────────────────────────
@@ -851,21 +862,30 @@ function getOverall(){
   return total;
 }
 
+function getDirection(overall){
+  if(overall>=0.4) return 'LONG';
+  if(overall<=0.2) return 'SHORT';
+  return 'SHORT'; // 20-40% = reduced short
+}
+
 function recalcOverall(){
   const overall=getOverall();
   setGauge(overall);
   const rec=document.getElementById('overall-rec');
   if(overall>=0.7){
-    rec.textContent='🟢 环境强势 — 正常仓位交易';
+    rec.textContent='🟢 环境强势 — 正常仓位做多 Strong Long';
     rec.style.background='rgba(38,166,154,.15)';rec.style.color='var(--green)';
   }else if(overall>=0.5){
-    rec.textContent='🟡 环境中性 — 减仓操作';
+    rec.textContent='🟡 环境偏多 — 减仓做多 Reduced Long';
     rec.style.background='rgba(247,184,78,.15)';rec.style.color='var(--yellow)';
-  }else if(overall>=0.3){
-    rec.textContent='🟠 环境偏弱 — 仅最小仓位';
+  }else if(overall>=0.4){
+    rec.textContent='⚪ 方向不明 — 观望 No Trade';
+    rec.style.background='rgba(255,255,255,.06)';rec.style.color='var(--text-muted)';
+  }else if(overall>=0.2){
+    rec.textContent='🟠 环境偏空 — 减仓做空 Reduced Short';
     rec.style.background='rgba(232,138,58,.15)';rec.style.color='var(--neon-orange)';
   }else{
-    rec.textContent='🔴 环境恶劣 — 观望或对冲';
+    rec.textContent='🔴 环境恶劣 — 正常仓位做空 Strong Short';
     rec.style.background='rgba(239,83,80,.15)';rec.style.color='var(--red)';
   }
 }
@@ -876,19 +896,45 @@ function updateCalc(){
   document.getElementById('conv-val').textContent=conv;
 
   const overall=getOverall();
-  const eff = Math.max(1,Math.min(10,Math.round(conv*overall)));
+  let direction, envFactor, eff;
+
+  if(overall >= 0.4){
+    // Long side: use overall directly
+    direction = 'LONG';
+    envFactor = overall;
+    eff = Math.max(1, Math.min(10, Math.round(conv * envFactor)));
+  } else {
+    // Short side: invert — low overall = strong short conviction
+    direction = 'SHORT';
+    envFactor = 1 - overall; // 20% overall → 0.8 factor, 10% → 0.9
+    eff = Math.max(1, Math.min(10, Math.round(conv * envFactor)));
+  }
 
   const effEl=document.getElementById('eff-conv');
   effEl.textContent='C'+eff;
   effEl.style.color=scoreCSSColor(eff/10);
+
+  // Direction indicator
+  const dirEl=document.getElementById('eff-direction');
+  if(dirEl){
+    if(direction==='LONG'){
+      dirEl.textContent='▲ LONG 做多';
+      dirEl.style.color='var(--green)';
+    } else {
+      dirEl.textContent='▼ SHORT 做空';
+      dirEl.style.color='var(--red)';
+    }
+  }
 
   const sizing=SIZING_MAP[eff];
   const riskEl=document.getElementById('eff-risk');
   riskEl.textContent=sizing.risk;
   riskEl.style.color=sizing.pct===0?'var(--text-muted)':scoreCSSColor(eff/10);
 
+  const dirLabel = direction==='LONG' ? '做多' : '做空';
+  const factorPct = Math.round(envFactor*100);
   document.getElementById('eff-desc').textContent=
-    `${sizing.desc} · 论点C${conv} × 环境${Math.round(overall*100)}% = 有效C${eff}`;
+    `${sizing.desc} · ${dirLabel} · 论点C${conv} × 环境${factorPct}% = 有效C${eff}`;
 
   // Update table highlights
   document.querySelectorAll('#sizing-table tbody tr').forEach(tr=>{
